@@ -1,38 +1,39 @@
 package Main;
 
-import static Main.Main.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainTest {
 
+    ArrayList<Book> bookArrayList = new ArrayList<>();
+    ArrayList<Reader> readerArrayList = new ArrayList<>();
 
-    @org.junit.jupiter.api.Test
-    void booksListCreationTest() {
-        var booksList = books(5);
-        assertEquals(5, booksList.size());
-    }
-
-    @org.junit.jupiter.api.Test
-    void booksListGetTest() {
-        var booksList = books(5);
-        assertEquals(5, booksList.size());
-        for (var i = 0; i < booksList.size(); i++){
-            assertArrayEquals(new String[]{"test" + i, "author" + i}, booksList.get(i));
+    @BeforeEach
+    void setUp() {
+        for (var i = 0; i < 10; i++) {
+            bookArrayList.add(new Book(i, "Book" + i, "Author" + i));
+            readerArrayList.add(new Reader(i,"Name" + i));
         }
     }
 
-    @org.junit.jupiter.api.Test
-    void readersListCreationTest() {
-        var readersList = readers(5);
-        assertEquals(5, readersList.size());
+    @Test
+    void booksListGetTest() {
+        assertEquals(10, bookArrayList.size());
+        for (var i = 0; i < 10; i++) {
+            assertEquals(new Book(i,"Book" + i, "Author" + i), bookArrayList.get(i));
+        }
     }
 
-    @org.junit.jupiter.api.Test
+
+    @Test
     void readersListGetTest() {
-        var readersList = readers(5);
-        assertEquals(5, readersList.size());
-        for (var i = 0; i < readersList.size(); i++){
-            assertEquals(new String("reader" + i), readersList.get(i));
+        assertEquals(10, readerArrayList.size());
+        for (var i = 0; i < 10; i++) {
+            assertEquals(new Reader(i,"Name" + i), readerArrayList.get(i));
         }
     }
 }
