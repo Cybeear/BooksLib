@@ -2,7 +2,6 @@ package Main;
 
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.TreeSet;
 
 
 public class Main {
@@ -60,6 +59,7 @@ public class Main {
     private static void registerReader(Scanner in) {
         //Add reader to list
         System.out.println("Please enter new reader full name!");
+        in.nextLine();
         readers.add(new Reader(readers.size(), in.nextLine()));
     }
 
@@ -76,17 +76,22 @@ public class Main {
         System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
         in.nextLine();
         var inputSplit = in.nextLine().replace(" ", "").split("/");
-        if (inputSplit[0] >= readers.size() || inputSplit[])
-        borrows.add(new Borrow(books.get(Integer.parseInt(inputSplit[0])),
-                readers.get(Integer.parseInt(inputSplit[1]))));
+        if ((parser(inputSplit[1]) >= readers.size()
+                || parser(inputSplit[0]) >= books.size())
+                || (parser(inputSplit[0]) == -1
+                || parser(inputSplit[1]) == -1)){
+            System.err.println("Error: enter valid data!");
+            return;
+        }
+        borrows.add(new Borrow(books.get(parser(inputSplit[0])),
+                readers.get(parser(inputSplit[1]))));
     }
 
     private static void returnBorrowedBook(Scanner in) {
         System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
         in.nextLine();
         var inputSplit = in.nextLine().replace(" ", "").split("/");
-        borrows.remove(new Borrow(books.get(Integer.parseInt(inputSplit[0])),
-                readers.get(Integer.parseInt(inputSplit[1]))));
+        borrows.remove(new Borrow(books.get(parser(inputSplit[0])), readers.get(parser(inputSplit[1]))));
     }
 
     private static void showAllBorrowed(Scanner in) {
@@ -95,7 +100,7 @@ public class Main {
         in.nextLine();
         var parsed = parser(in.nextLine());
         if (parsed == -1 && !checkSize(parsed, borrows)){
-            System.out.println("Error enter valid data!");
+            System.err.println("Error: enter valid data!");
             return;
         }
         borrows.stream().filter(borrow -> borrow.getReader().getId() == parsed).forEach(System.out::println);
@@ -103,11 +108,11 @@ public class Main {
 
     private static void showWhoBorrow(Scanner in) {
         //Show who borrow book by book id
-        System.out.println();
+        System.out.println("Please enter book id: ");
         in.nextLine();
         var parsed = parser(in.nextLine());
-        if (parsed == -1 && !checkSize(parsed, borrows)){
-            System.out.println("Error enter valid data!");
+        if (parsed == -1){
+            System.err.println("Error: enter valid data!");
             return;
         }
         borrows.stream().filter(borrow -> borrow.getBook().getId() == parsed).forEach(borrow -> System.out.println(borrow.getReader()));
@@ -118,13 +123,13 @@ public class Main {
     }
 
     private static int parser(String str) {
-        if (!checkData(str)) {
-            return Integer.parseInt(str);
+        if (checkData(str)) {
+            return -1;
         }
-        return -1;
+        return Integer.parseInt(str);
     }
 
     private static boolean checkData(String str) {
-        return str.matches("[a-zA-Z!@*&%^#+_,.()\\-\\]\\[\\\\]");
+        return str.matches("[a-zA-Z!@*&%^#+_,.()\\-\\]\\[\\\\A-Za-z]");
     }
 }

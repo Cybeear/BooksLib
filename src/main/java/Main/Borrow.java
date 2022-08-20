@@ -1,20 +1,37 @@
 package Main;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Borrow {
     private Reader reader;
-    private ArrayList<Book> books;
+    private Book book;
 
-    public Borrow(Reader reader) {
+
+    public Borrow(Book books, Reader reader) {
+        this.book = books;
         this.reader = reader;
     }
 
-    public void borrowBook(Book book){
-        this.books.add(book);
+    @Override
+    public String toString() {
+        return "Borrow{" +
+                "reader=" + reader +
+                ", books=" + book +
+                '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Borrow borrow = (Borrow) o;
+        return Objects.equals(reader, borrow.reader) && Objects.equals(book, borrow.book);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reader, book);
+    }
 
     public Reader getReader() {
         return reader;
@@ -24,21 +41,11 @@ public class Borrow {
         this.reader = reader;
     }
 
-    public ArrayList<Book> getBooks() {
-        return books;
+    public Book getBook() {
+        return book;
     }
 
-    public void setBooks(ArrayList<Book> books) {
-        this.books = books;
+    public void setBook(Book book) {
+        this.book = book;
     }
-
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Reader: \nid:" + reader.getId() + " name: " + reader.getName()
-                + "\nBooks:\n ");
-        books.stream().forEach(book -> stringBuilder.append(book.toString() + "\n"));
-        return stringBuilder.toString();
-    }
-
-
 }
