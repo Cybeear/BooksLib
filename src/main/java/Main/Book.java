@@ -8,6 +8,9 @@ public class Book {
     private String name;
     private String author;
 
+    public Book(int size, String[] split) {
+    }
+
     public static void showAllBooks(ArrayList<Book> bookArrayList) {
         bookArrayList.stream().forEach((System.out::println));
     }
