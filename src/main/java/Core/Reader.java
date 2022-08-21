@@ -1,4 +1,4 @@
-package Main;
+package Core;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -6,6 +6,11 @@ import java.util.Objects;
 public class Reader {
     private int id;
     private String name;
+
+    public static void showAllReaders(ArrayList<Reader> readerArrayList) {
+        readerArrayList.forEach(System.out::println);
+    }
+
 
     public int getId() {
         return id;
