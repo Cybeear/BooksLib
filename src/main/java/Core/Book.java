@@ -1,4 +1,4 @@
-package Main;
+package Core;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -12,7 +12,7 @@ public class Book {
     }
 
     public static void showAllBooks(ArrayList<Book> bookArrayList) {
-        bookArrayList.stream().forEach((System.out::println));
+        bookArrayList.forEach((System.out::println));
     }
 
     public int getId() {

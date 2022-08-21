@@ -1,4 +1,4 @@
-package Main;
+package Core;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -8,7 +8,7 @@ public class Reader {
     private String name;
 
     public static void showAllReaders(ArrayList<Reader> readerArrayList) {
-        readerArrayList.stream().forEach(System.out::println);
+        readerArrayList.forEach(System.out::println);
     }
 
 
