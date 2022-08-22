@@ -21,8 +21,8 @@ public class Main {
         ArrayList<Book> books = new ArrayList();
         ArrayList<Reader> readers = new ArrayList();
         for (var i = 0; i < 5; i++) {
-            books.add(new Book(i,"name" + i, "author" + i));
-            readers.add(new Reader(i,"name" + i));
+            books.add(new Book(i, "name" + i, "author" + i));
+            readers.add(new Reader(i, "name" + i));
         }
 
         var str = """
@@ -37,10 +37,18 @@ public class Main {
 
         String input;
         switch (option) {
-            case "1" -> Book.showAllBooks(books);
-            case "2" -> Reader.showAllReaders(readers);
+            case "1" -> showAllBooks(books);
+            case "2" -> showAllReaders(readers);
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have any option");
         }
+    }
+
+    public static void showAllBooks(ArrayList<Book> bookArrayList) {
+        bookArrayList.forEach((System.out::println));
+    }
+
+    public static void showAllReaders(ArrayList<Reader> readerArrayList) {
+        readerArrayList.forEach(System.out::println);
     }
 }

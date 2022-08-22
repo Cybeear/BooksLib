@@ -16,7 +16,7 @@ class MainTest {
     void setUp() {
         for (var i = 0; i < 10; i++) {
             bookArrayList.add(new Book(i, "Book" + i, "Author" + i));
-            readerArrayList.add(new Reader(i,"Name" + i));
+            readerArrayList.add(new Reader(i, "Name" + i));
         }
     }
 
@@ -24,7 +24,7 @@ class MainTest {
     void booksListGetTest() {
         assertEquals(10, bookArrayList.size());
         for (var i = 0; i < 10; i++) {
-            assertEquals(new Book(i,"Book" + i, "Author" + i), bookArrayList.get(i));
+            assertEquals(new Book(i, "Book" + i, "Author" + i), bookArrayList.get(i));
         }
     }
 
@@ -33,7 +33,7 @@ class MainTest {
     void readersListGetTest() {
         assertEquals(10, readerArrayList.size());
         for (var i = 0; i < 10; i++) {
-            assertEquals(new Reader(i,"Name" + i), readerArrayList.get(i));
+            assertEquals(new Reader(i, "Name" + i), readerArrayList.get(i));
         }
     }
 }

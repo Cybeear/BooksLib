@@ -8,10 +8,6 @@ public class Book {
     private String name;
     private String author;
 
-    public static void showAllBooks(ArrayList<Book> bookArrayList) {
-        bookArrayList.stream().forEach((System.out::println));
-    }
-
     public int getId() {
         return id;
     }
