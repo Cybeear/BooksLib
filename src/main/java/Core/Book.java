@@ -1,6 +1,5 @@
 package Core;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Book {
@@ -8,11 +7,10 @@ public class Book {
     private String name;
     private String author;
 
-    public Book(int size, String[] split) {
-    }
-
-    public static void showAllBooks(ArrayList<Book> bookArrayList) {
-        bookArrayList.forEach((System.out::println));
+    public Book(int id, String name, String author) {
+        this.id = id;
+        this.name = name;
+        this.author = author;
     }
 
     public int getId() {
@@ -39,11 +37,6 @@ public class Book {
         this.author = author;
     }
 
-    public Book(int id, String name, String author) {
-        this.id = id;
-        this.name = name;
-        this.author = author;
-    }
 
     @Override
     public boolean equals(Object o) {

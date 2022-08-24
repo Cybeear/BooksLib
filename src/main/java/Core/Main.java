@@ -44,57 +44,40 @@ public class Main {
         System.out.println(str);
         String option = in.next();
         switch (option) {
-            case "1" -> Book.showAllBooks(books);
-            case "2" -> Reader.showAllReaders(readers);
+            case "1" -> LibraryService.showAllBooks(books);
+            case "2" -> LibraryService.showAllReaders(readers);
             case "3" -> {
                 System.out.println("Please enter new reader full name!");
                 in.nextLine();
-                registerReader(readers, in.nextLine());
+                LibraryService.registerReader(readers, in.nextLine());
             }
             case "4" -> {
                 System.out.println("Please enter new book name and author separated by '/'. Like this: name / author");
                 in.nextLine();
-                addBook(books, in.nextLine());
+                LibraryService.addBook(books, in.nextLine());
             }
             case "5" -> {
                 System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
                 in.nextLine();
-                borrowABook(books, readers, borrows, in.nextLine());
+                LibraryService.borrowABook(books, readers, borrows, in.nextLine());
             }
             case "6" -> {
                 System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
                 in.nextLine();
-                returnBorrowedBook(books, readers, borrows, in.nextLine());
+                LibraryService.returnBorrowedBook(books, readers, borrows, in.nextLine());
             }
             case "7" -> {
                 System.out.println("Please enter reader id: ");
                 in.nextLine();
-                showAllBorrowed(borrows, in.nextLine());
+                LibraryService.showAllBorrowed(borrows, in.nextLine());
             }
             case "8" -> {
                 System.out.println("Please enter book id: ");
                 in.nextLine();
-                showWhoBorrow(borrows, in.nextLine());
+                LibraryService.showWhoBorrow(borrows, in.nextLine());
             }
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have any option");
         }
     }
-
-    public static void registerReader(ArrayList<Reader> readerArrayList, String str) {
-        //Add reader to list
-        readerArrayList.add(new Reader(readerArrayList.size(), str));
-    }
-
-    public static void addBook(ArrayList<Book> bookArrayList, String str) {
-        //Add book to list
-        var inputSplit = str.replace(" ", "").split("/");
-        if (inputSplit.length < 2){
-            System.err.println("Error: enter a valid data!");
-            return;
-        }
-        bookArrayList.add(new Book(bookArrayList.size(), inputSplit[0], inputSplit[1]));
-    }
-
-
 }
