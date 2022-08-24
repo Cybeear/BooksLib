@@ -8,6 +8,12 @@ public class Book {
     private String name;
     private String author;
 
+    public Book(int id, String name, String author) {
+        this.id = id;
+        this.name = name;
+        this.author = author;
+    }
+
     public int getId() {
         return id;
     }
@@ -32,11 +38,6 @@ public class Book {
         this.author = author;
     }
 
-    public Book(int id, String name, String author) {
-        this.id = id;
-        this.name = name;
-        this.author = author;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import static Core.Main.*;
-import static Core.Borrow.*;
+import static Core.LibraryService.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainTest {
@@ -31,7 +30,6 @@ class MainTest {
             assertEquals(new Book(i, "Book" + i, "Author" + i), bookArrayList.get(i));
         }
     }
-
 
     @Test
     void readersListGetTest() {

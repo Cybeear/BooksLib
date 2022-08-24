@@ -1,16 +1,15 @@
 package Core;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Reader {
     private int id;
     private String name;
 
-    public static void showAllReaders(ArrayList<Reader> readerArrayList) {
-        readerArrayList.forEach(System.out::println);
+    public Reader(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
-
 
     public int getId() {
         return id;
@@ -28,15 +27,6 @@ public class Reader {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "id: " + id + "\tname: " + name;
-    }
-
-    public Reader(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -49,5 +39,10 @@ public class Reader {
     @Override
     public int hashCode() {
         return Objects.hash(id, name);
+    }
+
+    @Override
+    public String toString() {
+        return "id: " + id + "\tname: " + name;
     }
 }
