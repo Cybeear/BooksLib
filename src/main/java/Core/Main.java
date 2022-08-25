@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
-    static ArrayList<Book> books = new ArrayList();
+    static ArrayList<Book> books = new ArrayList<>();
     static ArrayList<Reader> readers = new ArrayList();
     static LinkedList<Borrow> borrows = new LinkedList<>();
 
