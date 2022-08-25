@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main {
     static ArrayList<Book> books = new ArrayList<>();
-    static ArrayList<Reader> readers = new ArrayList();
+    static ArrayList<Reader> readers = new ArrayList<>();
     static LinkedList<Borrow> borrows = new LinkedList<>();
 
     public static void main(String[] args) {
@@ -38,6 +38,7 @@ public class Main {
                 |                              [8]SHOW CURRENT READER OF A BOOK WITH ID                              |
                 |                             \"TYPE \'exit\' TO STOP THE PROGRAM AND EXIT!\"                            |
                 -----------------------------------------------------------------------------------------------------""";
+
         System.out.println(str);
         String option = in.next();
         switch (option) {

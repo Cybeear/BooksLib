@@ -9,20 +9,17 @@ import java.util.List;
  */
 public class LibraryService {
     public static void registerReader(ArrayList<Reader> readerArrayList, String str) {
-        //Add reader to list
         readerArrayList.add(new Reader(readerArrayList.size(), str));
     }
 
     public static void addBook(ArrayList<Book> bookArrayList, String str) {
         //Add book to list
-        var inputSplit = str.split("/");
+        var inputSplit = str.split(" / ");
         if (inputSplit.length < 2) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        bookArrayList.add(new Book(bookArrayList.size(),
-                inputSplit[0].substring(0, inputSplit[0].length() - 1),
-                inputSplit[1].substring(1)));
+        bookArrayList.add(new Book(bookArrayList.size(), inputSplit[0], inputSplit[1]));
     }
 
     /**
@@ -38,7 +35,6 @@ public class LibraryService {
      * @param readerArrayList List of readers objects
      *                        show all readers in the list
      */
-
     //have a problem with Cyrillic output
     public static void showAllReaders(ArrayList<Reader> readerArrayList) {
         readerArrayList.forEach(System.out::println);
@@ -58,10 +54,10 @@ public class LibraryService {
         //Add book and reader obj if exists
         var inputSplit = str.split(" / ");
         int[] parsed = {parser(inputSplit[0]), parser(inputSplit[1])};
-        if ((str.equals(" ") || (parsed[0] == -1
-                || parsed[1] == -1)
+        if (str.equals(" ") || parsed[0] == -1
+                || parsed[1] == -1
                 || parsed[0] >= readerArrayList.size()
-                || parsed[1] >= bookArrayList.size())) {
+                || parsed[1] >= bookArrayList.size()) {
             System.err.println("Error: enter a valid data!");
             return;
         }
@@ -118,7 +114,7 @@ public class LibraryService {
      */
     public static void showAllBorrowedByReaderId(LinkedList<Borrow> borrowLinkedList, String str) {
         var parsed = parser(str);
-        if (parsed == -1 && !checkSize(parsed, borrowLinkedList)) {
+        if (parsed == -1) {
             System.err.println("Error: enter a valid data!");
             return;
         }
@@ -134,7 +130,6 @@ public class LibraryService {
      *                         print who borrow book by book id
      */
     public static void showWhoBorrowByBookId(LinkedList<Borrow> borrowLinkedList, String str) {
-        //Show who borrow book by book id
         var parsed = parser(str);
         if (parsed == -1) {
             System.err.println("Error: enter a valid data!");
@@ -164,15 +159,6 @@ public class LibraryService {
     }
 
     /**
-     * @param index index of element in list
-     * @param list  list of elements
-     * @return boolean
-     */
-    public static boolean checkSize(int index, List list) {
-        return index < list.size();
-    }
-
-    /**
      * @param str argument string
      * @return integer value
      */
@@ -188,11 +174,6 @@ public class LibraryService {
      */
     public static boolean checkData(String str) {
         //check if string match words or symbols, return boolean
-        return str.matches("^[a-zA-Z!@*&%^#+_,.()\\-\\\\A-Za-z]+$");
+        return str.matches("^[a-zA-Z!@*&%^#+_,.()\\-\\\\A-Za-zА-Яа-яїіІЇ]+$");
     }
-
-    /*
-    public static void showAllBorrows(LinkedList<Borrow> borrowLinkedList) {
-        borrowLinkedList.forEach(System.out::println);
-    }*/
 }
