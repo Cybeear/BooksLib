@@ -1,6 +1,5 @@
 package Core;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Book {
