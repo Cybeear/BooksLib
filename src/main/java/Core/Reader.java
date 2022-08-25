@@ -3,14 +3,23 @@ package Core;
 import java.util.Objects;
 
 public class Reader {
+
     private int id;
+
     private String name;
 
+    /**
+     * @param id integer field
+     * @param name string field
+     */
     public Reader(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
+    /**
+     * @return reader id
+     */
     public int getId() {
         return id;
     }
@@ -19,6 +28,9 @@ public class Reader {
         this.id = id;
     }
 
+    /**
+     * @return reader name
+     */
     public String getName() {
         return name;
     }
