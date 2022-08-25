@@ -15,7 +15,7 @@ public class LibraryService {
 
     public static void addBook(ArrayList<Book> bookArrayList, String str) {
         //Add book to list
-        var inputSplit = str.split("^/$");
+        var inputSplit = str.split("/");
         if (inputSplit.length < 2) {
             System.err.println("Error: enter a valid data!");
             return;
@@ -56,7 +56,7 @@ public class LibraryService {
     public static void borrowABook(ArrayList<Book> bookArrayList, ArrayList<Reader> readerArrayList,
                                    LinkedList<Borrow> borrowLinkedList, String str) {
         //Add book and reader obj if exists
-        var inputSplit = str.replace(" ", "").split("/");
+        var inputSplit = str.split(" / ");
         int[] parsed = {parser(inputSplit[0]), parser(inputSplit[1])};
         if ((str.equals(" ") || (parsed[0] == -1
                 || parsed[1] == -1)
@@ -147,7 +147,7 @@ public class LibraryService {
 
     /**
      * @param borrowLinkedList List of borrow objects
-     * @param id integer number, reader id
+     * @param id               integer number, reader id
      * @return true if reader borrow any book
      */
     private static boolean checkIfDataExistsByReaderId(LinkedList<Borrow> borrowLinkedList, int id) {
@@ -156,7 +156,7 @@ public class LibraryService {
 
     /**
      * @param borrowLinkedList List of borrow objects
-     * @param id integer number, book id
+     * @param id               integer number, book id
      * @return true if any reader borrow the book by this id
      */
     private static boolean checkIfDataExistsByBookId(LinkedList<Borrow> borrowLinkedList, int id) {
@@ -169,7 +169,6 @@ public class LibraryService {
      * @return boolean
      */
     public static boolean checkSize(int index, List list) {
-        //check size of list
         return index < list.size();
     }
 
@@ -179,9 +178,7 @@ public class LibraryService {
      */
     public static int parser(String str) {
         //parse int value in string
-        if (checkData(str) || str.equals(" ")) {
-            return -1;
-        }
+        if (checkData(str) || str.equals(" ")) return -1;
         return Integer.parseInt(str);
     }
 
