@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-import static Core.Borrow.*;
-
-
 public class Main {
     static ArrayList<Book> books = new ArrayList();
     static ArrayList<Reader> readers = new ArrayList();
@@ -69,12 +66,12 @@ public class Main {
             case "7" -> {
                 System.out.println("Please enter reader id: ");
                 in.nextLine();
-                LibraryService.showAllBorrowed(borrows, in.nextLine());
+                LibraryService.showAllBorrowedByReaderId(borrows, in.nextLine());
             }
             case "8" -> {
                 System.out.println("Please enter book id: ");
                 in.nextLine();
-                LibraryService.showWhoBorrow(borrows, in.nextLine());
+                LibraryService.showWhoBorrowByBookId(borrows, in.nextLine());
             }
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have any option");

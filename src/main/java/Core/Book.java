@@ -3,16 +3,28 @@ package Core;
 import java.util.Objects;
 
 public class Book {
+
     private int id;
+
     private String name;
+
     private String author;
 
+    /**
+     *
+     * @param id
+     * @param name
+     * @param author
+     */
     public Book(int id, String name, String author) {
         this.id = id;
         this.name = name;
         this.author = author;
     }
 
+    /**
+     * @return book id
+     */
     public int getId() {
         return id;
     }
@@ -21,6 +33,9 @@ public class Book {
         this.id = id;
     }
 
+    /**
+     * @return book name
+     */
     public String getName() {
         return name;
     }
@@ -29,6 +44,9 @@ public class Book {
         this.name = name;
     }
 
+    /**
+     * @return book author
+     */
     public String getAuthor() {
         return author;
     }
@@ -36,7 +54,6 @@ public class Book {
     public void setAuthor(String author) {
         this.author = author;
     }
-
 
     @Override
     public boolean equals(Object o) {
