@@ -1,31 +1,28 @@
 package Core;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Reader {
+    private static AtomicLong counter = new AtomicLong(1000L);
 
-    private int id;
+    private final long id;
 
     private String name;
 
     /**
-     * @param id integer field
      * @param name string field
      */
-    public Reader(int id, String name) {
-        this.id = id;
+    public Reader(String name) {
+        this.id = counter.incrementAndGet();
         this.name = name;
     }
 
     /**
      * @return reader id
      */
-    public int getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     /**

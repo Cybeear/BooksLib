@@ -3,14 +3,12 @@ package Core;
 import java.util.Objects;
 
 public class Borrow {
-
     private Reader reader;
 
     private Book book;
 
     /**
-     *
-     * @param books Book object field
+     * @param books  Book object field
      * @param reader Reader object field
      */
     public Borrow(Book books, Reader reader) {

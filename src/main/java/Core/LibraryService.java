@@ -2,160 +2,172 @@ package Core;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Scanner;
 
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
 public class LibraryService {
-    public static void registerReader(ArrayList<Reader> readerArrayList, String str) {
-        readerArrayList.add(new Reader(readerArrayList.size(), str));
+
+    static ArrayList<Book> books = new ArrayList<>();
+    static ArrayList<Reader> readers = new ArrayList<>();
+    static LinkedList<Borrow> borrows = new LinkedList<>();
+    private static Scanner in = new Scanner(System.in);
+
+    /**
+     * @param size Size of arrays
+     *             create default data
+     */
+    public static void createData(int size) {
+        books = new ArrayList<>();
+        readers = new ArrayList<>();
+        borrows = new LinkedList<>();
+        for (var i = 0; i < size; i++) {
+            books.add(new Book("Book" + i, "Author" + i));
+            readers.add(new Reader("Name" + 1));
+        }
     }
 
-    public static void addBook(ArrayList<Book> bookArrayList, String str) {
-        //Add book to list
+    /**
+     * Add new reader to list
+     */
+    public static void registerReader() {
+        System.out.println("Please enter new reader full name!");
+        readers.add(new Reader(in.nextLine()));
+    }
+
+    /**
+     * Add new book to list
+     */
+    public static void addBook() {
+        System.out.println("Please enter new book name and author separated by '/'. Like this: name / author");
+        var str = in.nextLine();
         var inputSplit = str.split(" / ");
         if (inputSplit.length < 2) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        bookArrayList.add(new Book(bookArrayList.size(), inputSplit[0], inputSplit[1]));
+        books.add(new Book(inputSplit[0], inputSplit[1]));
     }
 
     /**
-     * @param bookArrayList List of books objects
-     *                      show all books in the list
+     * Show all books in the list
      */
-    //have a problem with Cyrillic output
-    public static void showAllBooks(ArrayList<Book> bookArrayList) {
-        bookArrayList.forEach((System.out::println));
+    public static void showAllBooks() {
+        books.forEach(System.out::println);
     }
 
     /**
-     * @param readerArrayList List of readers objects
-     *                        show all readers in the list
+     * Show all readers in the list
      */
-    //have a problem with Cyrillic output
-    public static void showAllReaders(ArrayList<Reader> readerArrayList) {
-        readerArrayList.forEach(System.out::println);
+    public static void showAllReaders() {
+        readers.forEach(System.out::println);
     }
 
     /**
-     * @param bookArrayList    List of books objects
-     * @param readerArrayList  List of readers objects
-     * @param borrowLinkedList List of borrow objects
-     * @param str              string with arguments first number is a reader id, second number is a book id
-     *                         function call parser function, show error message
-     *                         and return to menu if string of arguments contains any characters other than numbers
-     *                         add to borrowList if string not contains any characters other than numbers
+     * Function call parser function, show error message
+     * and return to menu if string of arguments contains any characters other than numbers
+     * add to borrowList if string not contains any characters other than numbers
      */
-    public static void borrowABook(ArrayList<Book> bookArrayList, ArrayList<Reader> readerArrayList,
-                                   LinkedList<Borrow> borrowLinkedList, String str) {
-        //Add book and reader obj if exists
+    public static void borrowABook() {
+        System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
+        var str = in.nextLine();
         var inputSplit = str.split(" / ");
-        int[] parsed = {parser(inputSplit[0]), parser(inputSplit[1])};
-        if (str.equals(" ") || parsed[0] == -1
-                || parsed[1] == -1
-                || parsed[0] >= readerArrayList.size()
-                || parsed[1] >= bookArrayList.size()) {
+        var readerId = parser(inputSplit[0]);
+        var bookId = parser(inputSplit[1]);
+        if (str.equals(" ") || readerId == -1
+                || bookId == -1
+                || readerId >= readers.size()
+                || bookId >= books.size()) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (!checkIfBookBorrowed(borrowLinkedList, bookArrayList.get(parsed[1]))) {
-            borrowLinkedList.add(new Borrow(bookArrayList.get(parsed[1]),
-                    readerArrayList.get(parsed[0])));
-            System.out.println(borrowLinkedList.getLast().toString());
+        if (!checkIfBookBorrowed(books.get(bookId))) {
+            borrows.add(new Borrow(books.get(bookId),
+                    readers.get(readerId)));
+            System.out.println(borrows.getLast().toString());
         } else System.err.println("Error, this book is borrowed!");
     }
 
     /**
-     * @param bookArrayList    List of books objects
-     * @param readerArrayList  List of readers objects
-     * @param borrowLinkedList List of borrow objects
-     * @param str              string with arguments first number is a reader id, second number is a book id
-     *                         function call parser function, show error message
-     *                         and return to menu if string of arguments contains any characters other than numbers
-     *                         delete object from borrowList if string not contains any characters other than numbers
+     * Function call parser function, show error message
+     * and return to menu if string of arguments contains any characters other than numbers
+     * delete object from borrowList if string not contains any characters other than numbers
      */
-    public static void returnBorrowedBook(ArrayList<Book> bookArrayList, ArrayList<Reader> readerArrayList,
-                                          LinkedList<Borrow> borrowLinkedList, String str) {
+    public static void returnBorrowedBook() {
+        System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
+        var str = in.nextLine();
         var inputSplit = str.replace(" ", "").split("/");
-        int[] parsed = {parser(inputSplit[0]), parser(inputSplit[1])};
-        if ((str.equals(" ") || (parsed[0] == -1
-                || parsed[1] == -1)
-                || parsed[1] >= readerArrayList.size()
-                || parsed[0] >= bookArrayList.size())) {
+        var reader_id = parser(inputSplit[0]);
+        var book_id = parser(inputSplit[1]);
+        if ((str.equals(" ") || (reader_id == -1
+                || book_id == -1)
+                || book_id >= readers.size()
+                || reader_id >= books.size())) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (checkIfBookBorrowed(borrowLinkedList, bookArrayList.get(parsed[1]))) {
-            borrowLinkedList.remove(new Borrow(bookArrayList.get(parsed[1]), readerArrayList.get(parsed[0])));
-            System.out.println("Reader: " + readerArrayList.get(parsed[0]).toString()
-                    + " return the book: " + bookArrayList.get(parsed[1]).toString());
+        if (checkIfBookBorrowed(books.get(book_id))) {
+            borrows.remove(new Borrow(books.get(book_id), readers.get(reader_id)));
+            System.out.println("Reader: " + readers.get(reader_id).toString()
+                    + " return the book: " + books.get(book_id).toString());
         } else System.err.println("Error, this book is not borrowed!");
     }
 
     /**
-     * @param borrowLinkedList List of borrow objects
-     * @param book             Book object
+     * @param book Book object
      * @return boolean true if book is borrowed, use for-each from List class
      */
-    private static boolean checkIfBookBorrowed(LinkedList<Borrow> borrowLinkedList, Book book) {
-        for (Borrow borrow : borrowLinkedList)
-            if (borrow.getBook().equals(book)) return true;
-        return false;
+    private static boolean checkIfBookBorrowed(Book book) {
+        return borrows.stream().anyMatch(borrow -> borrow.getBook().equals(book));
     }
 
     /**
-     * @param borrowLinkedList List of borrow objects
-     * @param str              string with argument reader id, show error message
-     *                         and return to menu if string of arguments contains any symbols other than numbers or
-     *                         print all borrow objects by reader id
+     * Return to menu if string of arguments contains any symbols other than numbers or
+     * print all borrow objects by reader id
      */
-    public static void showAllBorrowedByReaderId(LinkedList<Borrow> borrowLinkedList, String str) {
-        var parsed = parser(str);
+    public static void showAllBorrowedByReaderId() {
+        System.out.println("Please enter reader id: ");
+        var parsed = parser(in.nextLine());
         if (parsed == -1) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (checkIfDataExistsByReaderId(borrowLinkedList, parsed)) {
-            borrowLinkedList.stream().filter(borrow -> borrow.getReader().getId() == parsed).forEach(System.out::println);
+        if (checkIfDataExistsByReaderId(parsed)) {
+            borrows.stream().filter(borrow -> borrow.getReader().getId() == parsed).forEach(System.out::println);
         } else System.out.println("This user don`t borrow a book!");
     }
 
     /**
-     * @param borrowLinkedList List of borrow objects
-     * @param str              string with argument book id, show error message
-     *                         and return to menu if string of arguments contains any symbols other than numbers or
-     *                         print who borrow book by book id
+     * Return to menu if string of arguments contains any symbols other than numbers or
+     * print who borrow book by book id
      */
-    public static void showWhoBorrowByBookId(LinkedList<Borrow> borrowLinkedList, String str) {
-        var parsed = parser(str);
+    public static void showWhoBorrowByBookId() {
+        System.out.println("Please enter book id: ");
+        var parsed = parser(in.nextLine());
         if (parsed == -1) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (checkIfDataExistsByBookId(borrowLinkedList, parsed))
-            borrowLinkedList.stream().filter(borrow -> borrow.getBook().getId() == parsed).forEach(borrow -> System.out.println(borrow.getReader()));
+        if (checkIfDataExistsByBookId(parsed))
+            borrows.stream().filter(borrow -> borrow.getBook().getId() == parsed).forEach(borrow -> System.out.println(borrow.getReader()));
         else System.out.println("This book isn`t borrowed!");
     }
 
     /**
-     * @param borrowLinkedList List of borrow objects
-     * @param id               integer number, reader id
+     * @param id integer number, reader id
      * @return true if reader borrow any book
      */
-    private static boolean checkIfDataExistsByReaderId(LinkedList<Borrow> borrowLinkedList, int id) {
-        return borrowLinkedList.stream().anyMatch(borrow -> borrow.getReader().getId() == id);
+    private static boolean checkIfDataExistsByReaderId(int id) {
+        return borrows.stream().anyMatch(borrow -> borrow.getReader().getId() == id);
     }
 
     /**
-     * @param borrowLinkedList List of borrow objects
-     * @param id               integer number, book id
+     * @param id integer number, book id
      * @return true if any reader borrow the book by this id
      */
-    private static boolean checkIfDataExistsByBookId(LinkedList<Borrow> borrowLinkedList, int id) {
-        return borrowLinkedList.stream().anyMatch(borrow -> borrow.getBook().getId() == id);
+    private static boolean checkIfDataExistsByBookId(int id) {
+        return borrows.stream().anyMatch(borrow -> borrow.getBook().getId() == id);
     }
 
     /**
