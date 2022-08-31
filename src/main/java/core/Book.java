@@ -1,32 +1,37 @@
-package Core;
+package core;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class Reader {
+public class Book {
     private static AtomicLong counter = new AtomicLong(1000L);
 
     private final long id;
 
     private String name;
 
+    private String author;
+
     /**
-     * @param name string field
+     *
+     * @param name
+     * @param author
      */
-    public Reader(String name) {
+    public Book(String name, String author) {
         this.id = counter.incrementAndGet();
         this.name = name;
+        this.author = author;
     }
 
     /**
-     * @return reader id
+     * @return book id
      */
     public long getId() {
         return id;
     }
 
     /**
-     * @return reader name
+     * @return book name
      */
     public String getName() {
         return name;
@@ -36,22 +41,32 @@ public class Reader {
         this.name = name;
     }
 
+    /**
+     * @return book author
+     */
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Reader reader = (Reader) o;
-        return Objects.equals(name, reader.name);
+        Book book = (Book) o;
+        return Objects.equals(name, book.name) && Objects.equals(author, book.author);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, author);
     }
 
     @Override
     public String toString() {
-        return "id: " + id + "\tname: " + name;
+        return "id: " + id + "\tname: " + name + "\tauthor: " + author + ".";
     }
 }
