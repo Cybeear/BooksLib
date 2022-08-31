@@ -1,19 +1,12 @@
 package Core;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Scanner;
 
 public class Main {
-    static ArrayList<Book> books = new ArrayList();
-    static ArrayList<Reader> readers = new ArrayList();
-    static LinkedList<Borrow> borrows = new LinkedList<>();
+
 
     public static void main(String[] args) {
-        for (var i = 0; i < 5; i++) {
-            books.add(new Book(books.size(), "name" + i, "author" + i));
-            readers.add(new Reader(readers.size(), "name" + i));
-        }
+        LibraryService.createData(5);
         System.out.println("WELCOME TO THE LIBRARY!");
 
         while (true) {
@@ -38,41 +31,18 @@ public class Main {
                 |                              [8]SHOW CURRENT READER OF A BOOK WITH ID                              |
                 |                             \"TYPE \'exit\' TO STOP THE PROGRAM AND EXIT!\"                            |
                 -----------------------------------------------------------------------------------------------------""";
+
         System.out.println(str);
-        String option = in.next();
+        String option = in.nextLine();
         switch (option) {
-            case "1" -> LibraryService.showAllBooks(books);
-            case "2" -> LibraryService.showAllReaders(readers);
-            case "3" -> {
-                System.out.println("Please enter new reader full name!");
-                in.nextLine();
-                LibraryService.registerReader(readers, in.nextLine());
-            }
-            case "4" -> {
-                System.out.println("Please enter new book name and author separated by '/'. Like this: name / author");
-                in.nextLine();
-                LibraryService.addBook(books, in.nextLine());
-            }
-            case "5" -> {
-                System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
-                in.nextLine();
-                LibraryService.borrowABook(books, readers, borrows, in.nextLine());
-            }
-            case "6" -> {
-                System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
-                in.nextLine();
-                LibraryService.returnBorrowedBook(books, readers, borrows, in.nextLine());
-            }
-            case "7" -> {
-                System.out.println("Please enter reader id: ");
-                in.nextLine();
-                LibraryService.showAllBorrowedByReaderId(borrows, in.nextLine());
-            }
-            case "8" -> {
-                System.out.println("Please enter book id: ");
-                in.nextLine();
-                LibraryService.showWhoBorrowByBookId(borrows, in.nextLine());
-            }
+            case "1" -> LibraryService.showAllBooks();
+            case "2" -> LibraryService.showAllReaders();
+            case "3" -> LibraryService.registerReader();
+            case "4" -> LibraryService.addBook();
+            case "5" -> LibraryService.borrowABook();
+            case "6" -> LibraryService.returnBorrowedBook();
+            case "7" -> LibraryService.showAllBorrowedByReaderId();
+            case "8" -> LibraryService.showWhoBorrowByBookId();
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have any option");
         }

@@ -1,10 +1,12 @@
 package Core;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Book {
+    private static AtomicLong counter = new AtomicLong(1000L);
 
-    private int id;
+    private final long id;
 
     private String name;
 
@@ -12,12 +14,11 @@ public class Book {
 
     /**
      *
-     * @param id
      * @param name
      * @param author
      */
-    public Book(int id, String name, String author) {
-        this.id = id;
+    public Book(String name, String author) {
+        this.id = counter.incrementAndGet();
         this.name = name;
         this.author = author;
     }
@@ -25,12 +26,8 @@ public class Book {
     /**
      * @return book id
      */
-    public int getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     /**
