@@ -20,28 +20,28 @@ class MainTest {
     @Test
     void booksListGetTest() {
         for (var i = 0; i < 10; i++) {
-            assertEquals(new Book(i, "Book" + i, "Author" + i), books.get(i));
+            var book = new Book("Book" + i, "Author" + i);
+            assertEquals(book, books.get(i));
         }
     }
 
     @Test
     void readersListGetTest() {
         for (var i = 0; i < 10; i++) {
-            assertEquals(new Reader(i, "Name" + i), readers.get(i));
+            assertEquals(new Reader("Name" + i), readers.get(i));
         }
     }
 
     @Test
     void registerReaderTest() {
-        readers.add(new Reader(readers.size(), "test"));
+        readers.add(new Reader("test"));
         assertEquals(11, readers.size());
-        assertEquals(10, readers.get(readers.size() - 1).getId());
         assertEquals("test", readers.get(readers.size() - 1).getName());
     }
 
     @Test
     void addBookWithValidDataTest() {
-        books.add(new Book(books.size(), "testBook", "testAuthor"));
+        books.add(new Book("testBook", "testAuthor"));
         assertEquals(11, books.size());
         var createdBook = books.get(10);
         assertEquals("testBook", createdBook.getName());

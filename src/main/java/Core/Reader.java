@@ -42,12 +42,12 @@ public class Reader {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Reader reader = (Reader) o;
-        return id == reader.id && Objects.equals(name, reader.name);
+        return Objects.equals(name, reader.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 
     @Override

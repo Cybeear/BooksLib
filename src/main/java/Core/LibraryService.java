@@ -24,7 +24,7 @@ public class LibraryService {
         borrows = new LinkedList<>();
         for (var i = 0; i < size; i++) {
             books.add(new Book("Book" + i, "Author" + i));
-            readers.add(new Reader("Name" + 1));
+            readers.add(new Reader("Name" + i));
         }
     }
 
