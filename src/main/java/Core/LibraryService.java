@@ -73,20 +73,23 @@ public class LibraryService {
         System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
         var str = in.nextLine();
         var inputSplit = str.split(" / ");
-        var readerId = parser(inputSplit[0]);
-        var bookId = parser(inputSplit[1]);
-        if (str.equals(" ") || readerId == -1
-                || bookId == -1
-                || readerId >= readers.size()
-                || bookId >= books.size()) {
+        var reader_id = parser(inputSplit[0]);
+        var book_id = parser(inputSplit[1]);
+        if (str.equals(" ") || reader_id == -1
+                || book_id == -1) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (!checkIfBookBorrowed(books.get(bookId))) {
-            borrows.add(new Borrow(books.get(bookId),
-                    readers.get(readerId)));
-            System.out.println(borrows.getLast().toString());
-        } else System.err.println("Error, this book is borrowed!");
+        var book = books.stream().filter(_book -> _book.getId() == book_id).findFirst();
+        var reader = readers.stream().filter(_reader -> _reader.getId() == reader_id).findFirst();
+        if (book.isPresent() && reader.isPresent()) {
+            if (!checkIfBookBorrowed(book.get())) {
+                borrows.add(new Borrow(book.get(),
+                        reader.get()));
+                System.out.println(borrows.getLast().toString());
+            } else System.err.println("Error, this book is borrowed!");
+        } else System.err.println("Error");
+
     }
 
     /**
@@ -100,18 +103,20 @@ public class LibraryService {
         var inputSplit = str.replace(" ", "").split("/");
         var reader_id = parser(inputSplit[0]);
         var book_id = parser(inputSplit[1]);
-        if ((str.equals(" ") || (reader_id == -1
-                || book_id == -1)
-                || book_id >= readers.size()
-                || reader_id >= books.size())) {
+        if (str.equals(" ") || (reader_id == -1
+                || book_id == -1)) {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        if (checkIfBookBorrowed(books.get(book_id))) {
-            borrows.remove(new Borrow(books.get(book_id), readers.get(reader_id)));
-            System.out.println("Reader: " + readers.get(reader_id).toString()
-                    + " return the book: " + books.get(book_id).toString());
-        } else System.err.println("Error, this book is not borrowed!");
+        var book = books.stream().filter(_book -> _book.getId() == book_id).findFirst();
+        var reader = readers.stream().filter(_reader -> _reader.getId() == reader_id).findFirst();
+        if (book.isPresent() && reader.isPresent()) {
+            if (checkIfBookBorrowed(book.get())) {
+                borrows.remove(new Borrow(book.get(), reader.get()));
+                System.out.println("Reader: " + reader.get()
+                        + " return the book: " + book.get());
+            } else System.err.println("Error, this book is not borrowed!");
+        } else System.err.println("Error");
     }
 
     /**
