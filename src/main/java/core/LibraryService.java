@@ -58,6 +58,7 @@ public class LibraryService {
      */
     public void registerReader(String str) {
         if (!str.equals(" ")) readers.add(new Reader(str));
+        else System.out.println("Error: enter a valid data!");
     }
 
     /**
@@ -112,8 +113,8 @@ public class LibraryService {
                 borrows.add(new Borrow(book.get(),
                         reader.get()));
                 System.out.println(borrows.getLast().toString());
-            } else System.err.println("Error, this book is borrowed!");
-        } else System.err.println("Error data is not exists!");
+            } else System.err.println("Error: this book is borrowed!");
+        } else System.err.println("Error: data is not exists!");
     }
 
     /**
@@ -140,8 +141,8 @@ public class LibraryService {
                 borrows.remove(new Borrow(bookToBorrow.get(), readerToBorrow.get()));
                 System.out.println("Reader: " + readerToBorrow.get()
                         + " return the book: " + bookToBorrow.get());
-            } else System.err.println("Error, this book is not borrowed!");
-        } else System.err.println("Error data is not exists");
+            } else System.err.println("Error: this book is not borrowed!");
+        } else System.err.println("Error: data is not exists");
     }
 
     /**
@@ -164,7 +165,7 @@ public class LibraryService {
         }
         if (checkIfDataExistsByReaderId(parsed)) {
             borrows.stream().filter(borrow -> borrow.getReader().getId() == parsed).forEach(System.out::println);
-        } else System.out.println("This user don`t borrow a book!");
+        } else System.err.println("Error: this user don`t borrow a book!");
     }
 
     /**
@@ -179,7 +180,7 @@ public class LibraryService {
         }
         if (checkIfDataExistsByBookId(parsed))
             borrows.stream().filter(borrow -> borrow.getBook().getId() == parsed).forEach(borrow -> System.out.println(borrow.getReader()));
-        else System.out.println("This book isn`t borrowed!");
+        else System.out.println("Error: this book isn`t borrowed!");
     }
 
     /**
