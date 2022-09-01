@@ -106,12 +106,12 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        var book = books.stream().filter(_book -> _book.getId() == bookId).findFirst();
-        var reader = readers.stream().filter(_reader -> _reader.getId() == readerId).findFirst();
-        if (book.isPresent() && reader.isPresent()) {
-            if (!checkIfBookBorrowed(book.get())) {
-                borrows.add(new Borrow(book.get(),
-                        reader.get()));
+        var bookToBorrow = books.stream().filter(book -> book.getId() == bookId).findFirst();
+        var readerToBorrow = readers.stream().filter(reader -> reader.getId() == readerId).findFirst();
+        if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
+            if (!checkIfBookBorrowed(bookToBorrow.get())) {
+                borrows.add(new Borrow(bookToBorrow.get(),
+                        readerToBorrow.get()));
                 System.out.println(borrows.getLast().toString());
             } else System.err.println("Error: this book is borrowed!");
         } else System.err.println("Error: data is not exists!");
@@ -204,14 +204,14 @@ public class LibraryService {
      * @return integer value -1 if string not contains only digits
      */
     private int parser(String str) {
-        return checkData(str) ? Integer.parseInt(str) : -1;
+        return isValidNumber(str) ? Integer.parseInt(str) : -1;
     }
 
     /**
      * @param str argument string
      * @return boolean true if string contains only digits
      */
-    private boolean checkData(String str) {
+    private boolean isValidNumber(String str) {
         return str.matches("^\\d+$");
     }
 }
