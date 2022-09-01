@@ -3,19 +3,16 @@ package core;
 import java.util.Scanner;
 
 public class Main {
-
-
     public static void main(String[] args) {
-        LibraryService.createData(5);
+        var service = new LibraryService();
+        service.createData(5);
         System.out.println("WELCOME TO THE LIBRARY!");
-
         while (true) {
-            menu();
+            menu(service);
         }
     }
 
-    public static void menu() {
-        //Creates and print menu, User can enter any option and get callback
+    public static void menu(LibraryService service) {
         Scanner in = new Scanner(System.in);
 
         var str = """
@@ -35,14 +32,32 @@ public class Main {
         System.out.println(str);
         String option = in.nextLine();
         switch (option) {
-            case "1" -> LibraryService.showAllBooks();
-            case "2" -> LibraryService.showAllReaders();
-            case "3" -> LibraryService.registerReader();
-            case "4" -> LibraryService.addBook();
-            case "5" -> LibraryService.borrowABook();
-            case "6" -> LibraryService.returnBorrowedBook();
-            case "7" -> LibraryService.showAllBorrowedByReaderId();
-            case "8" -> LibraryService.showWhoBorrowByBookId();
+            case "1" -> service.showAllBooks();
+            case "2" -> service.showAllReaders();
+            case "3" -> {
+                System.out.println("Please enter new reader full name!");
+                service.registerReader(in.nextLine());
+            }
+            case "4" -> {
+                System.out.println("Please enter new book name and author separated by '/'. Like this: name / author");
+                service.addBook(in.nextLine());
+            }
+            case "5" -> {
+                System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
+                service.borrowABook(in.nextLine());
+            }
+            case "6" -> {
+                System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
+                service.returnBorrowedBook(in.nextLine());
+            }
+            case "7" -> {
+                System.out.println("Please enter reader id: ");
+                service.showAllBorrowedByReaderId(in.nextLine());
+            }
+            case "8" -> {
+                System.out.println("Please enter book id: ");
+                service.showWhoBorrowByBookId(in.nextLine());
+            }
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have any option");
         }
