@@ -1,4 +1,4 @@
-package core;
+package entity;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +19,12 @@ public class Book {
      */
     public Book(String name, String author) {
         this.id = counter.incrementAndGet();
+        this.name = name;
+        this.author = author;
+    }
+
+    public Book(long id, String name, String author) {
+        this.id = id;
         this.name = name;
         this.author = author;
     }

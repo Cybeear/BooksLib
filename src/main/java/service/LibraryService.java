@@ -1,4 +1,8 @@
-package core;
+package service;
+
+import entity.Book;
+import entity.Borrow;
+import entity.Reader;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

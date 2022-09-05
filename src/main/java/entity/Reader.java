@@ -1,4 +1,4 @@
-package core;
+package entity;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,6 +15,11 @@ public class Reader {
      */
     public Reader(String name) {
         this.id = counter.incrementAndGet();
+        this.name = name;
+    }
+
+    public Reader(long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
