@@ -1,8 +1,7 @@
 package dao;
 
-import service.ConnectionService;
-import service.ParserService;
 import entity.Reader;
+import service.ConnectionService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,13 +37,13 @@ public class ReaderDao implements Dao {
 
     /**
      * @param id integer field
-     * @return Reader object or null if not exists
+     * @return Reader object if exist
      */
     @Override
-    public Reader fetchById(int id) {
+    public Reader fetchById(long id) {
         try (var connection = connectionService.createConnection()) {
             var statement = connection.prepareStatement("Select * from \"Reader\" where id = ?");
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             var resultSet = statement.executeQuery();
             resultSet.next();
             return new Reader(resultSet.getInt(1),
@@ -56,15 +55,16 @@ public class ReaderDao implements Dao {
     }
 
     /**
-     * @param str String field name of Reader
-     * @return boolean true if operation successful
+     * @param obj Reader object
+     * @return boolean true if operation success
      */
     @Override
-    public boolean addNew(String str) {
+    public boolean addNew(Object obj) {
         try (var connection = connectionService.createConnection()) {
             var sql = "INSERT INTO \"Reader\"(name) VALUES(?)";
             var statement = connection.prepareStatement(sql);
-            statement.setString(1, str);
+            var reader = (Reader) obj;
+            statement.setString(1, reader.getName());
             var resultSet = statement.executeUpdate();
             return resultSet == 1;
         } catch (SQLException sqlException) {
@@ -73,17 +73,16 @@ public class ReaderDao implements Dao {
     }
 
     /**
-     * @param str string of id, parsed to integer
-     * @return boolean if operation successful
+     * @param obj Reader object
+     * @return boolean if operation success
      */
     @Override
-    public boolean deleteRecord(String str) {
+    public boolean deleteRecord(Object obj) {
         try (var connection = connectionService.createConnection()) {
             var sql = "DELETE FROM \"Reader\" WHERE id = ?";
             var statement = connection.prepareStatement(sql);
-            var parsed = ParserService.parseInt(str);
-            if (parsed == -1) return false;
-            statement.setInt(1, parsed);
+            var reader = (Reader) obj;
+            statement.setLong(1, reader.getId());
             var resultSet = statement.executeUpdate();
             return resultSet == 1;
         } catch (SQLException sqlException) {

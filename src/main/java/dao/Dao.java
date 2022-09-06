@@ -5,9 +5,9 @@ import java.util.List;
 public interface Dao {
     List fetchAll();
 
-    Object fetchById(int id);
+    Object fetchById(long id);
 
-    boolean addNew(String str);
+    boolean addNew(Object obj);
 
-    boolean deleteRecord(String str);
+    boolean deleteRecord(Object obj);
 }

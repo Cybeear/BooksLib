@@ -13,7 +13,6 @@ public class Book {
     private String author;
 
     /**
-     *
      * @param name
      * @param author
      */
