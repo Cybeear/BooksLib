@@ -23,6 +23,8 @@ public class MenuService {
                 |                              [6]RETURN A BOOK TO THE LIBRARY                                       |
                 |                              [7]SHOW ALL BORROWED BOOK BY USER ID                                  |
                 |                              [8]SHOW CURRENT READER OF A BOOK WITH ID                              |
+                |                              [9]SHOW ALL READERS WITH THEIR BORROWED BOOKS                         |
+                |                              [10]SHOW ALL BOOKS WITH THEIR BORROWERS                               |
                 |                             "TYPE 'exit' TO STOP THE PROGRAM AND EXIT!"                            |
                 -----------------------------------------------------------------------------------------------------""";
         System.out.println(str);
@@ -53,6 +55,12 @@ public class MenuService {
             case "8" -> {
                 System.out.println("Please enter book id: ");
                 libraryService.showWhoBorrowByBookId(in.nextLine());
+            }
+            case "9" -> {
+                libraryService.showAllReadersWhitTheirBorrows();
+            }
+            case "10" -> {
+                libraryService.showAllBooksWithTheirBorrowers();
             }
             case "exit" -> System.exit(0);
             default -> System.out.println("Program dont have this option");

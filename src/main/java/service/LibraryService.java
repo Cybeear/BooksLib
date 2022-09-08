@@ -159,4 +159,23 @@ public class LibraryService {
             else System.err.println("Error: this book isn`t borrowed!");
         } else System.err.println("Error, this book is not exist!");
     }
+
+    public void showAllBooksWithTheirBorrowers() {
+        bookDao.fetchAll().forEach((book) -> {
+            if (checkIfBookBorrowed(book)) {
+                System.out.println(borrowDao.fetchById(book.getId()));
+            } else System.out.println(book + "\t-\tavailable");
+        });
+    }
+
+    /**
+     * Show all readers in the list
+     */
+    public void showAllReadersWhitTheirBorrows() {
+        readerDao.fetchAll().forEach((reader -> {
+            var borrows = borrowDao.fetchAllById(reader.getId());
+            if (borrows != null) borrows.forEach(System.out::println);
+            else System.out.println(reader + "\t-\tno books borrowed");
+        }));
+    }
 }

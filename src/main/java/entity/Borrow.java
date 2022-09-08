@@ -40,7 +40,7 @@ public class Borrow {
 
     @Override
     public String toString() {
-        return "Reader " + reader.toString() + " borrow the book, " + book.toString();
+        return "Reader: " + reader.toString() + "\t-\tborrow the book, " + book.toString();
     }
 
     @Override
