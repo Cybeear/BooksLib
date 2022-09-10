@@ -7,8 +7,6 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * LibraryService class used to interaction with data and objects in online Library
@@ -81,8 +79,8 @@ public class LibraryService {
         }
         var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
         var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
-        if (bookToBorrow != null && readerToBorrow != null) {
-            var borrow = new Borrow(bookToBorrow, readerToBorrow);
+        if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
+            var borrow = new Borrow(bookToBorrow.get(), readerToBorrow.get());
             borrowDaoJdbcImpl.save(bookId, readerId);
             System.out.println(borrow);
         } else System.err.println("Error: data is not exists!");
@@ -107,7 +105,7 @@ public class LibraryService {
         }
         var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
         var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
-        if (bookToBorrow != null && readerToBorrow != null) {
+        if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             borrowDaoJdbcImpl.returnBook(bookId, readerId);
         } else System.err.println("Error: data is not exists");
     }
@@ -124,9 +122,9 @@ public class LibraryService {
             return;
         }
         var reader = readerDaoJdbcImpl.findById(parsed);
-        if (reader != null) {
+        if (reader.isPresent()) {
             var borrows = borrowDaoJdbcImpl.findAll();
-            borrows.stream().filter((borrow -> borrow.getReader().equals(reader))).forEach(System.out::println);
+            borrows.stream().filter((borrow -> borrow.getReader().equals(reader.get()))).forEach(System.out::println);
         } else System.err.println("Error, this reader is not exist!");
     }
 
@@ -141,9 +139,9 @@ public class LibraryService {
             return;
         }
         var book = bookDaoJdbcImpl.findById(parsed);
-        if (book != null) {
+        if (book.isPresent()) {
             var borrows = borrowDaoJdbcImpl.findAll().stream()
-                    .filter(borrowObj -> borrowObj.getBook().equals(book)).toList();
+                    .filter(borrowObj -> borrowObj.getBook().equals(book.get())).toList();
             if (borrows.size() > 0) {
                 var reader = borrows.get(0).getReader();
                 System.out.println(reader);

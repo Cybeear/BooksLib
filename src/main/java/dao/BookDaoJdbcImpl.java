@@ -6,6 +6,7 @@ import service.ConnectionService;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BookDaoJdbcImpl implements BookDao {
     private ConnectionService connectionService = new ConnectionService();
@@ -15,18 +16,29 @@ public class BookDaoJdbcImpl implements BookDao {
      * @return
      */
     @Override
-    public Book save(Book book) {
+    public Optional<Book> save(Book book) {
         try (var connection = connectionService.createConnection()) {
-            var sql = "INSERT INTO \"Book\"(name, author) VALUES(?, ?)";
-            var statement = connection.prepareStatement(sql);
+            var statement =
+                    connection.prepareStatement("INSERT INTO \"Book\"(name, author) VALUES(?, ?)");
             statement.setString(1, book.getName());
             statement.setString(2, book.getAuthor());
             var resultSet = statement.executeUpdate();
             statement.close();
-            return book;
+            statement = connection.prepareStatement("SELECT * FROM  \"Book\" WHERE name = ? AND author = ?");
+            statement.setString(1, book.getName());
+            statement.setString(2, book.getAuthor());
+            var resultSet1 = statement.executeQuery();
+            resultSet1.next();
+            var newBook = new Book(resultSet1.getLong(1),
+                    resultSet1.getString(2),
+                    resultSet1.getString(3));
+            resultSet1.close();
+            statement.close();
+            return Optional.of(newBook);
+
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -44,6 +56,7 @@ public class BookDaoJdbcImpl implements BookDao {
                         resultSet.getString(2),
                         resultSet.getString(3)));
             }
+            resultSet.close();
             statement.close();
             if (bookList.size() != 0) return bookList;
             return bookList;
@@ -58,7 +71,7 @@ public class BookDaoJdbcImpl implements BookDao {
      * @return
      */
     @Override
-    public Book findById(long bookId) {
+    public Optional<Book> findById(long bookId) {
         try (var connection = connectionService.createConnection()) {
             var statement = connection.prepareStatement("Select * from \"Book\" where id = ?");
             statement.setLong(1, bookId);
@@ -67,10 +80,11 @@ public class BookDaoJdbcImpl implements BookDao {
             var book = new Book(resultSet.getLong(1),
                     resultSet.getString(2),
                     resultSet.getString(3));
+            resultSet.close();
             statement.close();
-            return book;
+            return Optional.of(book);
         } catch (SQLException sqlException) {
-            return null;
+            return Optional.empty();
         }
     }
 

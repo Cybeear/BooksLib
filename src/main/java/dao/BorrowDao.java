@@ -1,11 +1,13 @@
 package dao;
 
+import entity.Book;
 import entity.Borrow;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BorrowDao {
-    Borrow save(long bookId, long readerId);
+    Optional<Borrow> save(long bookId, long readerId);
 
     List<Borrow> findAll();
 

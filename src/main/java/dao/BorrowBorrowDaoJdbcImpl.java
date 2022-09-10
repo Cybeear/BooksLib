@@ -8,6 +8,7 @@ import service.ConnectionService;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
     private final ConnectionService connectionService = new ConnectionService();
@@ -18,7 +19,7 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
      * @return
      */
     @Override
-    public Borrow save(long bookId, long readerId) {
+    public Optional<Borrow> save(long bookId, long readerId) {
         try (var connection = connectionService.createConnection()) {
             var statement =
                     connection.prepareStatement("INSERT INTO \"Borrow\"(reader_id, book_id) VALUES(?, ?)");
@@ -39,12 +40,13 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
                     resultSet.getString(3));
             Reader reader = new Reader(resultSet.getInt(4),
                     resultSet.getString(5));
+            resultSet.close();
             statement.close();
-            return new Borrow(book, reader);
+            return Optional.of(new Borrow(book, reader));
 
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -67,10 +69,10 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
                         resultSet.getString(5));
                 borrowList.add(new Borrow(book, reader));
             }
+            resultSet.close();
             statement.close();
             return borrowList;
-        } catch (
-                SQLException sqlException) {
+        } catch (SQLException sqlException) {
             return borrowList;
         }
     }
