@@ -1,25 +1,28 @@
 package service;
 
-import dao.BookDao;
-import dao.BorrowDao;
-import dao.ReaderDao;
+import dao.BookDaoJdbcImpl;
+import dao.BorrowBorrowDaoJdbcImpl;
+import dao.ReaderDaoJdbcImpl;
 import entity.Book;
 import entity.Borrow;
 import entity.Reader;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
 public class LibraryService {
-    BookDao bookDao;
-    ReaderDao readerDao;
-    BorrowDao borrowDao;
+    BookDaoJdbcImpl bookDaoJdbcImpl;
+    ReaderDaoJdbcImpl readerDaoJdbcImpl;
+    BorrowBorrowDaoJdbcImpl borrowDaoJdbcImpl;
     ParserService parserService;
 
     {
-        bookDao = new BookDao();
-        readerDao = new ReaderDao();
-        borrowDao = new BorrowDao();
+        bookDaoJdbcImpl = new BookDaoJdbcImpl();
+        readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
+        borrowDaoJdbcImpl = new BorrowBorrowDaoJdbcImpl();
         parserService = new ParserService();
     }
 
@@ -27,7 +30,7 @@ public class LibraryService {
      * Add new reader to list
      */
     public void registerReader(String str) {
-        if (!str.equals(" ")) readerDao.addNew(new Reader(str));
+        if (!str.equals(" ")) readerDaoJdbcImpl.save(new Reader(str));
         else System.err.println("Error: enter a valid data!");
     }
 
@@ -42,21 +45,21 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        bookDao.addNew(new Book(inputSplit[0], inputSplit[1]));
+        bookDaoJdbcImpl.save(new Book(inputSplit[0], inputSplit[1]));
     }
 
     /**
      * Show all books in the list
      */
     public void showAllBooks() {
-        bookDao.fetchAll().forEach(System.out::println);
+        bookDaoJdbcImpl.findAll().forEach(System.out::println);
     }
 
     /**
      * Show all readers in the list
      */
     public void showAllReaders() {
-        readerDao.fetchAll().forEach(System.out::println);
+        readerDaoJdbcImpl.findAll().forEach(System.out::println);
     }
 
     /**
@@ -76,14 +79,12 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        var bookToBorrow = bookDao.fetchById(bookId);
-        var readerToBorrow = readerDao.fetchById(readerId);
+        var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
+        var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
         if (bookToBorrow != null && readerToBorrow != null) {
-            if (!checkIfBookBorrowed(bookToBorrow)) {
-                var borrow = new Borrow(bookToBorrow, readerToBorrow);
-                borrowDao.addNew(borrow);
-                System.out.println(borrow);
-            } else System.err.println("Error: this book is borrowed!");
+            var borrow = new Borrow(bookToBorrow, readerToBorrow);
+            borrowDaoJdbcImpl.save(bookId, readerId);
+            System.out.println(borrow);
         } else System.err.println("Error: data is not exists!");
     }
 
@@ -104,25 +105,13 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        var bookToBorrow = bookDao.fetchById(bookId);
-        var readerToBorrow = readerDao.fetchById(readerId);
+        var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
+        var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
         if (bookToBorrow != null && readerToBorrow != null) {
-            if (checkIfBookBorrowed(bookToBorrow)) {
-                var borrow = new Borrow(bookToBorrow, readerToBorrow);
-                if (borrowDao.deleteRecord(borrow)) System.out.println("Error, try again!");
-                else System.out.println("Reader: " + readerToBorrow
-                        + " return the book: " + bookToBorrow);
-            } else System.err.println("Error: this book is not borrowed!");
+            borrowDaoJdbcImpl.returnBook(bookId, readerId);
         } else System.err.println("Error: data is not exists");
     }
 
-    /**
-     * @param book Book object
-     * @return boolean true if book is borrowed, use for-each from List class
-     */
-    private boolean checkIfBookBorrowed(Book book) {
-        return borrowDao.fetchById(book.getId()) != null;
-    }
 
     /**
      * Return to menu if string of arguments contains any symbols other than numbers or
@@ -134,11 +123,10 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        var reader = readerDao.fetchById(parsed);
+        var reader = readerDaoJdbcImpl.findById(parsed);
         if (reader != null) {
-            var borrows = borrowDao.fetchAllById(reader.getId());
-            if (borrows != null) borrows.forEach(System.out::println);
-            else System.err.println("Error: this reader don`t borrow a book!");
+            var borrows = borrowDaoJdbcImpl.findAll();
+            borrows.stream().filter((borrow -> borrow.getReader().equals(reader))).forEach(System.out::println);
         } else System.err.println("Error, this reader is not exist!");
     }
 
@@ -152,30 +140,32 @@ public class LibraryService {
             System.err.println("Error: enter a valid data!");
             return;
         }
-        var book = bookDao.fetchById(parsed);
+        var book = bookDaoJdbcImpl.findById(parsed);
         if (book != null) {
-            var borrow = borrowDao.fetchById(book.getId());
-            if (borrow != null) System.out.println(borrow);
-            else System.err.println("Error: this book isn`t borrowed!");
+            var borrows = borrowDaoJdbcImpl.findAll().stream()
+                    .filter(borrowObj -> borrowObj.getBook().equals(book)).toList();
+            if (borrows.size() > 0) {
+                var reader = borrows.get(0).getReader();
+                System.out.println(reader);
+            } else System.err.println("Error: this book isn`t borrowed!");
         } else System.err.println("Error, this book is not exist!");
     }
 
-    public void showAllBooksWithTheirBorrowers() {
-        bookDao.fetchAll().forEach((book) -> {
-            if (checkIfBookBorrowed(book)) {
-                System.out.println(borrowDao.fetchById(book.getId()));
-            } else System.out.println(book + "\t-\tavailable");
-        });
+    public void showAllReadersWhitTheirBorrows() {
+        return;
+        /*List<Borrow> allBorrowed = borrowDaoJdbcImpl.findAll();
+        List<Reader> readers = readerDaoJdbcImpl.findAll();*/
+        /*"""
+        Select b.id, b.name, b.author, r.id, r.name
+        from "Reader" r
+        LEFT JOIN "Borrow" bor on r.id = bor.reader_id
+        LEFT JOIN "Book" b on b.id = bor.book_id
+        """*/
+
     }
 
-    /**
-     * Show all readers in the list
-     */
-    public void showAllReadersWhitTheirBorrows() {
-        readerDao.fetchAll().forEach((reader -> {
-            var borrows = borrowDao.fetchAllById(reader.getId());
-            if (borrows != null) borrows.forEach(System.out::println);
-            else System.out.println(reader + "\t-\tno books borrowed");
-        }));
+    public void showAllBooksWithTheirBorrowers() {
+        return;
+//        List<Borrow> allBorrowed = borrowDaoJdbcImpl.findAll();
     }
 }

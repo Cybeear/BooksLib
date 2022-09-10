@@ -11,18 +11,11 @@ public class ConnectionService {
 
     public Connection createConnection() {
         try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("PostgreSQL JDBC Driver is not found. Include it in your library path ");
-            e.printStackTrace();
-            return null;
-        }
-
-        try {
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            System.exit(1);
         }
+        return null;
     }
 }
