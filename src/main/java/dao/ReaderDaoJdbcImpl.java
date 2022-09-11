@@ -4,6 +4,7 @@ import entity.Reader;
 import service.ConnectionService;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,21 +19,21 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
      */
     @Override
     public Optional<Reader> save(Reader reader) {
+        Reader newReader = null;
         try (var connection = connectionService.createConnection()) {
-            var sql = "INSERT INTO \"Reader\"(name) VALUES(?)";
-            var statement = connection.prepareStatement(sql);
+            var statement = connection.prepareStatement("INSERT INTO \"Reader\"(name) VALUES(?)",
+                    Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, reader.getName());
-            var resultSet = statement.executeUpdate();
-            statement.close();
-            statement = connection.prepareStatement("SELECT * FROM \"Reader\" WHERE name = ?");
-            var resultSet1 = statement.executeQuery();
-            resultSet1.next();
-            var newReader = new Reader(resultSet1.getLong(1), resultSet1.getString(2));
-            resultSet1.close();
-            statement.close();
-            return Optional.of(newReader);
+            var resultSet = statement.getResultSet();
+            if (resultSet.next()) {
+                newReader = new Reader(resultSet.getLong(1), resultSet.getString(2));
+                resultSet.close();
+                statement.close();
+            }
+            return Optional.ofNullable(newReader);
         } catch (SQLException sqlException) {
-            return Optional.empty();
+            System.err.println("SqlError: " + sqlException.getMessage());
+            return Optional.ofNullable(newReader);
         }
     }
 
@@ -41,19 +42,15 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
      */
     @Override
     public List<Reader> findAll() {
-        var connection = connectionService.createConnection();
         List<Reader> readerList = new ArrayList<>();
-        try {
-            var statement = connection.prepareStatement("Select * from \"Reader\"");
-            var resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                readerList.add(new Reader(resultSet.getInt(1),
-                        resultSet.getString(2)));
-            }
-            resultSet.close();
-            connection.close();
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement("SELECT * FROM \"Reader\"");
+             var resultSet = statement.executeQuery()) {
+            while (resultSet.next()) readerList.add(new Reader(resultSet.getInt(1),
+                    resultSet.getString(2)));
             return readerList;
         } catch (SQLException sqlException) {
+            System.err.println("SqlError: " + sqlException.getMessage());
             return readerList;
         }
     }
@@ -64,17 +61,17 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
      */
     @Override
     public Optional<Reader> findById(long readerId) {
-        try (var connection = connectionService.createConnection()) {
-            var statement =
-                    connection.prepareStatement("SELECT * FROM \"Reader\" WHERE id = ?");
+        Reader reader = null;
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement("SELECT * FROM \"Reader\" WHERE id = ?")) {
             statement.setLong(1, readerId);
             var resultSet = statement.executeQuery();
-            resultSet.next();
-            var reader = new Reader(resultSet.getLong(1), resultSet.getString(2));
-            statement.close();
-            return Optional.of(reader);
+            if (resultSet.next()) reader = new Reader(resultSet.getLong(1), resultSet.getString(2));
+            resultSet.close();
+            return Optional.ofNullable(reader);
         } catch (SQLException sqlException) {
-            return Optional.empty();
+            System.err.println("SqlError: " + sqlException.getMessage());
+            return Optional.ofNullable(reader);
         }
     }
 
@@ -85,18 +82,19 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
     @Override
     public List<Reader> findAllByBookId(long bookId) {
         List<Reader> readers = new ArrayList<>();
-        try (var connection = connectionService.createConnection()) {
-            var statement =
-                    connection.prepareStatement("SELECT r.id, r.name FROM \"Reader\" r\n" +
-                            "    LEFT JOIN \"Borrow\" bor on r.id = bor.reader_id\n" +
-                            "    LEFT JOIN \"Book\" b on bor.book_id = b.id\n" +
-                            "WHERE b.id = ?");
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement("SELECT r.id, r.name FROM \"Reader\" r\n" +
+                     "    LEFT JOIN \"Borrow\" bor ON r.id = bor.reader_id\n" +
+                     "    LEFT JOIN \"Book\" b ON bor.book_id = b.id\n" +
+                     "WHERE b.id = ?")) {
             statement.setLong(1, bookId);
             var resultSet = statement.executeQuery();
-            while (resultSet.next()) readers.add(new Reader(resultSet.getLong(1), resultSet.getString(2)));
-            statement.close();
+            while (resultSet.next()) readers.add(new Reader(resultSet.getLong(1),
+                    resultSet.getString(2)));
+            resultSet.close();
             return readers;
         } catch (SQLException sqlException) {
+            System.err.println("SqlError: " + sqlException.getMessage());
             return readers;
         }
     }

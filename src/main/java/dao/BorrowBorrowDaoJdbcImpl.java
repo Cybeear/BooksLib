@@ -20,33 +20,35 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
      */
     @Override
     public Optional<Borrow> save(long bookId, long readerId) {
+        Borrow borrow = null;
         try (var connection = connectionService.createConnection()) {
             var statement =
-                    connection.prepareStatement("INSERT INTO \"Borrow\"(reader_id, book_id) VALUES(?, ?)");
+                    connection.prepareStatement("INSERT INTO Borrow(reader_id, book_id) VALUES(?, ?)");
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             statement.executeUpdate();
             statement.close();
             statement =
                     connection.prepareStatement("SELECT b.id, b.name, b.author, r.id, r.name " +
-                            "from \"Borrow\" bor JOIN \"Book\" b on b.id = bor.book_id " +
-                            "JOIN \"Reader\" r on r.id = bor.reader_id WHERE reader_id = ? AND book_id = ?");
+                            "from Borrow bor JOIN Book b on b.id = bor.book_id " +
+                            "JOIN Reader r on r.id = bor.reader_id WHERE reader_id = ? AND book_id = ?");
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             var resultSet = statement.executeQuery();
-            resultSet.next();
-            Book book = new Book(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3));
-            Reader reader = new Reader(resultSet.getInt(4),
-                    resultSet.getString(5));
+            if (resultSet.next()) {
+                Book book = new Book(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3));
+                Reader reader = new Reader(resultSet.getInt(4),
+                        resultSet.getString(5));
+                borrow = new Borrow(book, reader);
+            }
             resultSet.close();
             statement.close();
-            return Optional.of(new Borrow(book, reader));
-
+            return Optional.ofNullable(borrow);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
-            return Optional.empty();
+            return Optional.ofNullable(borrow);
         }
     }
 
@@ -56,11 +58,11 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
     @Override
     public List<Borrow> findAll() {
         List<Borrow> borrowList = new LinkedList<>();
-        try (var connection = connectionService.createConnection()) {
-            var statement = connection.prepareStatement("Select b.id, b.name, b.author, r.id, r.name " +
-                    "from \"Borrow\" JOIN \"Book\" b on b.id = \"Borrow\".book_id " +
-                    "JOIN \"Reader\" r on r.id = \"Borrow\".reader_id");
-            var resultSet = statement.executeQuery();
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement("SELECT b.id, b.name, b.author, r.id, r.name FROM" +
+                     " Borrow bor JOIN Book b ON b.id = bor.book_id " +
+                     "JOIN Reader r ON r.id = bor.reader_id");
+             var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 Book book = new Book(resultSet.getInt(1),
                         resultSet.getString(2),
@@ -69,8 +71,6 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
                         resultSet.getString(5));
                 borrowList.add(new Borrow(book, reader));
             }
-            resultSet.close();
-            statement.close();
             return borrowList;
         } catch (SQLException sqlException) {
             return borrowList;
@@ -83,15 +83,14 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
      */
     @Override
     public void returnBook(long bookId, long readerId) {
-        try (var connection = connectionService.createConnection()) {
-            var sql = "DELETE FROM \"Borrow\" WHERE reader_id = ? AND book_id = ?";
-            var statement = connection.prepareStatement(sql);
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement("DELETE FROM Borrow " +
+                     "WHERE reader_id = ? AND book_id = ?")) {
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             statement.executeUpdate();
-            statement.close();
         } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
+            System.out.println("SqlError: " + sqlException.getMessage());
         }
     }
 

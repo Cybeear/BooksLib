@@ -150,20 +150,18 @@ public class LibraryService {
     }
 
     public void showAllReadersWhitTheirBorrows() {
-        return;
-        /*List<Borrow> allBorrowed = borrowDaoJdbcImpl.findAll();
-        List<Reader> readers = readerDaoJdbcImpl.findAll();*/
-        /*"""
-        Select b.id, b.name, b.author, r.id, r.name
-        from "Reader" r
-        LEFT JOIN "Borrow" bor on r.id = bor.reader_id
-        LEFT JOIN "Book" b on b.id = bor.book_id
-        """*/
-
+/*
+        """SELECT r.id, r.name, b.id, b.name, author
+        FROM Reader r
+        LEFT JOIN Borrow bor ON r.id = bor.reader_id
+        LEFT JOIN Book b ON bor.book_id = b.id"""
+*/
     }
 
     public void showAllBooksWithTheirBorrowers() {
-        return;
-//        List<Borrow> allBorrowed = borrowDaoJdbcImpl.findAll();
+/*      """SELECT r.id, r.name, b.id, b.name, author
+        FROM "Book" b
+        LEFT JOIN "Borrow" bor ON b.id = bor.book_id
+        LEFT JOIN "Reader" r ON bor.reader_id = r.id"""*/
     }
 }
