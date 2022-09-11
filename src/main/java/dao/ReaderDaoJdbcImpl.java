@@ -21,10 +21,12 @@ public class ReaderDaoJdbcImpl implements ReaderDao {
     public Optional<Reader> save(Reader reader) {
         Reader newReader = null;
         try (var connection = connectionService.createConnection()) {
-            var statement = connection.prepareStatement("INSERT INTO \"Reader\"(name) VALUES(?)",
+            var statement = connection.prepareStatement("INSERT INTO \"Reader\"(id, name) " +
+                            "VALUES(Default, ?)",
                     Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, reader.getName());
-            var resultSet = statement.getResultSet();
+            statement.executeUpdate();
+            var resultSet = statement.getGeneratedKeys();
             if (resultSet.next()) {
                 newReader = new Reader(resultSet.getLong(1), resultSet.getString(2));
                 resultSet.close();

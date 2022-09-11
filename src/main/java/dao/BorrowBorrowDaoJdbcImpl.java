@@ -23,15 +23,15 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
         Borrow borrow = null;
         try (var connection = connectionService.createConnection()) {
             var statement =
-                    connection.prepareStatement("INSERT INTO Borrow(reader_id, book_id) VALUES(?, ?)");
+                    connection.prepareStatement("INSERT INTO \"Borrow\"(reader_id, book_id) VALUES(?, ?)");
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             statement.executeUpdate();
             statement.close();
             statement =
                     connection.prepareStatement("SELECT b.id, b.name, b.author, r.id, r.name " +
-                            "from Borrow bor JOIN Book b on b.id = bor.book_id " +
-                            "JOIN Reader r on r.id = bor.reader_id WHERE reader_id = ? AND book_id = ?");
+                            "from \"Borrow\" bor JOIN \"Book\" b on b.id = bor.book_id " +
+                            "JOIN \"Reader\" r on r.id = bor.reader_id WHERE reader_id = ? AND book_id = ?");
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             var resultSet = statement.executeQuery();
@@ -60,8 +60,8 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
         List<Borrow> borrowList = new LinkedList<>();
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement("SELECT b.id, b.name, b.author, r.id, r.name FROM" +
-                     " Borrow bor JOIN Book b ON b.id = bor.book_id " +
-                     "JOIN Reader r ON r.id = bor.reader_id");
+                     " \"Borrow\" bor JOIN \"Book\" b ON b.id = bor.book_id " +
+                     "JOIN \"Reader\" r ON r.id = bor.reader_id");
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 Book book = new Book(resultSet.getInt(1),
@@ -84,7 +84,7 @@ public class BorrowBorrowDaoJdbcImpl implements BorrowDao {
     @Override
     public void returnBook(long bookId, long readerId) {
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("DELETE FROM Borrow " +
+             var statement = connection.prepareStatement("DELETE FROM \"Borrow\" " +
                      "WHERE reader_id = ? AND book_id = ?")) {
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
