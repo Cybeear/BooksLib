@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS "Book";
-DROP TABLE IF EXISTS "Reader";
-DROP TABLE IF EXISTS "Borrow";
+DROP TABLE IF EXISTS book;
+DROP TABLE IF EXISTS Reader;
+DROP TABLE IF EXISTS Borrow;
 
-create table "Book"
+create table book
 (
     id     serial
         primary key,
@@ -10,32 +10,32 @@ create table "Book"
     author varchar(20) not null
 );
 
-alter table "Book"
+alter table book
     owner to postgres;
 
-create table "Reader"
+create table reader
 (
     id   serial
         primary key,
     name varchar(20) not null
 );
 
-alter table "Reader"
+alter table reader
     owner to postgres;
 
-create table "Borrow"
+create table borrow
 (
     id        serial
         primary key,
     reader_id integer not null
         constraint reader_id
-            references "Reader"
+            references Reader
             on update cascade on delete cascade,
     book_id   integer not null
         constraint book_id
-            references "Book"
+            references book
 );
 
-alter table "Borrow"
+alter table borrow
     owner to postgres;
 

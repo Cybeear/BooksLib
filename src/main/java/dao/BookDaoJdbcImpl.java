@@ -1,7 +1,6 @@
 package dao;
 
 import entity.Book;
-import entity.Reader;
 import service.ConnectionService;
 
 import java.sql.SQLException;
@@ -21,7 +20,7 @@ public class BookDaoJdbcImpl implements BookDao {
     public Optional<Book> save(Book book) {
         Book newBook = null;
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("INSERT INTO \"Book\"(id, name, author) " +
+             var statement = connection.prepareStatement("INSERT INTO book(id, name, author) " +
                              "VALUES(Default, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS);) {
             statement.setString(1, book.getName());
@@ -47,7 +46,7 @@ public class BookDaoJdbcImpl implements BookDao {
     public List<Book> findAll() {
         List<Book> bookList = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT * FROM \"Book\"");
+             var statement = connection.prepareStatement("SELECT * FROM book");
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 bookList.add(new Book(resultSet.getInt(1),
@@ -69,7 +68,7 @@ public class BookDaoJdbcImpl implements BookDao {
     public Optional<Book> findById(long bookId) {
         Book book = null;
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT * FROM \"Book\" WHERE id = ?")) {
+             var statement = connection.prepareStatement("SELECT * FROM book WHERE id = ?")) {
             statement.setLong(1, bookId);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) book = new Book(resultSet.getLong(1),
@@ -89,9 +88,9 @@ public class BookDaoJdbcImpl implements BookDao {
     public List<Book> findAllByReaderId(long readerId) {
         List<Book> books = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT r.id, r.name FROM \"Book\" b\n" +
-                     "    LEFT JOIN \"Borrow\" bor ON b.id = bor.book_id\n" +
-                     "    LEFT JOIN \"Reader\" r ON bor.reader_id = r.id\n" +
+             var statement = connection.prepareStatement("SELECT r.id, r.name FROM book b\n" +
+                     "    LEFT JOIN borrow bor ON b.id = bor.book_id\n" +
+                     "    LEFT JOIN reader r ON bor.reader_id = r.id\n" +
                      "WHERE b.id = ?")) {
             statement.setLong(1, readerId);
             var resultSet = statement.executeQuery();

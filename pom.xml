@@ -20,6 +20,13 @@
         <version>5.9.0</version>
         <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.googlejavaformat/google-java-format -->
+    <dependency>
+        <groupId>com.google.googlejavaformat</groupId>
+        <artifactId>google-java-format</artifactId>
+        <version>1.15.0</version>
+    </dependency>
+
 </dependencies>
     <properties>
         <maven.compiler.source>18</maven.compiler.source>

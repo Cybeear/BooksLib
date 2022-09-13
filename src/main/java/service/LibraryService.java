@@ -150,6 +150,7 @@ public class LibraryService {
     }
 
     public void showAllReadersWhitTheirBorrows() {
+
 /*
         """SELECT r.id, r.name, b.id, b.name, author
         FROM Reader r
