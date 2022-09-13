@@ -1,7 +1,7 @@
 package service;
 
 import dao.BookDaoJdbcImpl;
-import dao.BorrowBorrowDaoJdbcImpl;
+import dao.BorrowDaoJdbcImpl;
 import dao.ReaderDaoJdbcImpl;
 import entity.Book;
 import entity.Borrow;
@@ -14,13 +14,13 @@ import entity.Reader;
 public class LibraryService {
     BookDaoJdbcImpl bookDaoJdbcImpl;
     ReaderDaoJdbcImpl readerDaoJdbcImpl;
-    BorrowBorrowDaoJdbcImpl borrowDaoJdbcImpl;
+    BorrowDaoJdbcImpl borrowDaoJdbcImpl;
     ParserService parserService;
 
     {
         bookDaoJdbcImpl = new BookDaoJdbcImpl();
         readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
-        borrowDaoJdbcImpl = new BorrowBorrowDaoJdbcImpl();
+        borrowDaoJdbcImpl = new BorrowDaoJdbcImpl();
         parserService = new ParserService();
     }
 
@@ -123,8 +123,8 @@ public class LibraryService {
         }
         var reader = readerDaoJdbcImpl.findById(parsed);
         if (reader.isPresent()) {
-            var borrows = borrowDaoJdbcImpl.findAll();
-            borrows.stream().filter((borrow -> borrow.getReader().equals(reader.get()))).forEach(System.out::println);
+            var borrows = borrowDaoJdbcImpl.findAllBorrowedByReaderId(reader.get().getId());
+            if (borrows.size() > 0) borrows.forEach(System.out::println);
         } else System.err.println("Error, this reader is not exist!");
     }
 
@@ -140,12 +140,9 @@ public class LibraryService {
         }
         var book = bookDaoJdbcImpl.findById(parsed);
         if (book.isPresent()) {
-            var borrows = borrowDaoJdbcImpl.findAll().stream()
-                    .filter(borrowObj -> borrowObj.getBook().equals(book.get())).toList();
-            if (borrows.size() > 0) {
-                var reader = borrows.get(0).getReader();
-                System.out.println(reader);
-            } else System.err.println("Error: this book isn`t borrowed!");
+            var borrows = borrowDaoJdbcImpl.findAllBorrowedByBookId(book.get().getId());
+            if (borrows.size() > 0) borrows.forEach(System.out::println);
+            else System.err.println("Error: this book isn`t borrowed!");
         } else System.err.println("Error, this book is not exist!");
     }
 

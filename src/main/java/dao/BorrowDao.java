@@ -7,9 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BorrowDao {
-    Optional<Borrow> save(long bookId, long readerId);
+    Borrow save(long bookId, long readerId);
 
     List<Borrow> findAll();
+
+    List<Borrow> findAllBorrowedByReaderId(long readerId);
+
+    List<Borrow> findAllBorrowedByBookId(long bookId);
 
     void returnBook(long bookId, long readerId);
 }

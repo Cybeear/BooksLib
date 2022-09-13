@@ -12,8 +12,8 @@ public class ConnectionService {
     public Connection createConnection() {
         try {
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException sqlException) {
+            System.err.println("Error with JDBC create connection" + sqlException.getMessage());
             System.exit(1);
         }
         return null;

@@ -17,25 +17,20 @@ public class BookDaoJdbcImpl implements BookDao {
      * @return
      */
     @Override
-    public Optional<Book> save(Book book) {
-        Book newBook = null;
+    public Book save(Book book) {
+        var sql = "INSERT INTO book(name, author) VALUES(?, ?)";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("INSERT INTO book(id, name, author) " +
-                             "VALUES(Default, ?, ?)",
-                     Statement.RETURN_GENERATED_KEYS);) {
+             var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, book.getName());
             statement.setString(2, book.getAuthor());
             statement.executeUpdate();
             var resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) newBook = new Book(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3));
+            if (resultSet.next()) book.setId(resultSet.getLong(1));
             resultSet.close();
-            return Optional.ofNullable(newBook);
-
+            return book;
         } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            return Optional.ofNullable(newBook);
+            throw new RuntimeException("Failed to save book [" + book + "]!\n" +
+                    sqlException.getLocalizedMessage());
         }
     }
 
@@ -44,9 +39,10 @@ public class BookDaoJdbcImpl implements BookDao {
      */
     @Override
     public List<Book> findAll() {
+        var sql = "SELECT * FROM book";
         List<Book> bookList = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT * FROM book");
+             var statement = connection.prepareStatement(sql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 bookList.add(new Book(resultSet.getInt(1),
@@ -55,8 +51,7 @@ public class BookDaoJdbcImpl implements BookDao {
             }
             return bookList;
         } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            return bookList;
+            throw new RuntimeException("Failed to find books!\n" + sqlException.getLocalizedMessage());
         }
     }
 
@@ -66,17 +61,21 @@ public class BookDaoJdbcImpl implements BookDao {
      */
     @Override
     public Optional<Book> findById(long bookId) {
+        var sql = "SELECT * FROM book WHERE id = ?";
         Book book = null;
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT * FROM book WHERE id = ?")) {
+             var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, bookId);
             var resultSet = statement.executeQuery();
-            if (resultSet.next()) book = new Book(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3));
+            if (resultSet.next()) {
+                book = new Book(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3));
+            }
             return Optional.ofNullable(book);
         } catch (SQLException sqlException) {
-            return Optional.ofNullable(book);
+            throw new RuntimeException("Failed to find book by Id: "
+                    + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
 
@@ -86,22 +85,25 @@ public class BookDaoJdbcImpl implements BookDao {
      */
     @Override
     public List<Book> findAllByReaderId(long readerId) {
+        var sql = "SELECT r.id, r.name FROM book b\n" +
+                "    LEFT JOIN borrow bor ON b.id = bor.book_id\n" +
+                "    LEFT JOIN reader r ON bor.reader_id = r.id\n" +
+                "WHERE b.id = ?";
         List<Book> books = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement("SELECT r.id, r.name FROM book b\n" +
-                     "    LEFT JOIN borrow bor ON b.id = bor.book_id\n" +
-                     "    LEFT JOIN reader r ON bor.reader_id = r.id\n" +
-                     "WHERE b.id = ?")) {
+             var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, readerId);
             var resultSet = statement.executeQuery();
-            while (resultSet.next()) books.add(new Book(resultSet.getLong(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3)));
+            while (resultSet.next()) {
+                books.add(new Book(resultSet.getLong(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3)));
+            }
             resultSet.close();
             return books;
         } catch (SQLException sqlException) {
-            System.err.println("SqlError: " + sqlException.getMessage());
-            return books;
+            throw new RuntimeException("Failed to find books by reader Id: "
+                    + readerId + "\n" + sqlException.getLocalizedMessage());
         }
     }
 

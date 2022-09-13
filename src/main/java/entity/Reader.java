@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Reader {
     private static AtomicLong counter = new AtomicLong(1000L);
 
-    private final long id;
+    private long id;
 
     private String name;
 
@@ -28,6 +28,10 @@ public class Reader {
      */
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     /**

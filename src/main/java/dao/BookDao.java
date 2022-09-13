@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookDao {
-    Optional<Book> save(Book book);
+    Book save(Book book);
 
     List<Book> findAll();
 
