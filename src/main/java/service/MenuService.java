@@ -1,12 +1,16 @@
 package service;
 
+import dao.BookDaoJdbcImpl;
+import dao.BorrowDaoJdbcImpl;
+import dao.ReaderDaoJdbcImpl;
+
 import java.util.Scanner;
 
 public class MenuService {
     private final LibraryService libraryService;
 
-    {
-        libraryService = new LibraryService();
+    public MenuService(LibraryService libraryService) {
+        this.libraryService = libraryService;
     }
 
     public void showMenu() {
@@ -57,7 +61,7 @@ public class MenuService {
                 libraryService.showWhoBorrowByBookId(in.nextLine());
             }
             case "9" -> {
-                libraryService.showAllReadersWhitTheirBorrows();
+                libraryService.showAllReadersWithTheirBorrows();
             }
             case "10" -> {
                 libraryService.showAllBooksWithTheirBorrowers();

@@ -7,43 +7,24 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 
+import java.util.List;
+
 
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
 public class LibraryService {
+
     BookDaoJdbcImpl bookDaoJdbcImpl;
     ReaderDaoJdbcImpl readerDaoJdbcImpl;
     BorrowDaoJdbcImpl borrowDaoJdbcImpl;
     ParserService parserService;
 
-    {
-        bookDaoJdbcImpl = new BookDaoJdbcImpl();
-        readerDaoJdbcImpl = new ReaderDaoJdbcImpl();
-        borrowDaoJdbcImpl = new BorrowDaoJdbcImpl();
-        parserService = new ParserService();
-    }
-
-    /**
-     * Add new reader to list
-     */
-    public void registerReader(String str) {
-        if (!str.equals(" ")) readerDaoJdbcImpl.save(new Reader(str));
-        else System.err.println("Error: enter a valid data!");
-    }
-
-    /**
-     * Add new book to list
-     */
-    public void addBook(String str) {
-        var inputSplit = str.split(" / ");
-        if (inputSplit.length < 2
-                || inputSplit[0].equals(" ")
-                || inputSplit[1].equals(" ")) {
-            System.err.println("Error: enter a valid data!");
-            return;
-        }
-        bookDaoJdbcImpl.save(new Book(inputSplit[0], inputSplit[1]));
+    public LibraryService(BookDaoJdbcImpl bookDaoJdbcImpl, ReaderDaoJdbcImpl readerDaoJdbcImpl, BorrowDaoJdbcImpl borrowDaoJdbcImpl, ParserService parserService) {
+        this.bookDaoJdbcImpl = bookDaoJdbcImpl;
+        this.readerDaoJdbcImpl = readerDaoJdbcImpl;
+        this.borrowDaoJdbcImpl = borrowDaoJdbcImpl;
+        this.parserService = parserService;
     }
 
     /**
@@ -58,6 +39,28 @@ public class LibraryService {
      */
     public void showAllReaders() {
         readerDaoJdbcImpl.findAll().forEach(System.out::println);
+    }
+
+    /**
+     * Add new reader to list
+     */
+    public void registerReader(String str) {
+        if (!str.equals(" ")) System.out.println(readerDaoJdbcImpl.save(new Reader(str)) + " successful registered!");
+        else System.err.println("Error: enter a valid data!");
+    }
+
+    /**
+     * Add new book to list
+     */
+    public void addBook(String str) {
+        var inputSplit = str.split(" / ");
+        if (inputSplit.length < 2
+                || inputSplit[0].equals(" ")
+                || inputSplit[1].equals(" ")) {
+            System.err.println("Error: enter a valid data!");
+            return;
+        }
+        System.out.println(bookDaoJdbcImpl.save(new Book(inputSplit[0], inputSplit[1])) + " successful added!");
     }
 
     /**
@@ -107,9 +110,9 @@ public class LibraryService {
         var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             borrowDaoJdbcImpl.returnBook(bookId, readerId);
+            System.out.println(bookToBorrow.get() + " is returned by " + readerToBorrow.get());
         } else System.err.println("Error: data is not exists");
     }
-
 
     /**
      * Return to menu if string of arguments contains any symbols other than numbers or
@@ -146,9 +149,16 @@ public class LibraryService {
         } else System.err.println("Error, this book is not exist!");
     }
 
-    public void showAllReadersWhitTheirBorrows() {
-
-/*
+    public void showAllReadersWithTheirBorrows() {
+        List<Reader> readers = readerDaoJdbcImpl.findAll();
+        readers.forEach((reader) -> {
+            var borrowedBooks = bookDaoJdbcImpl.findAllByReaderId(reader.getId());
+            if (borrowedBooks.size() != 0) {
+                System.out.println(reader + " borrow the books:");
+                borrowedBooks.forEach(System.out::println);
+            } else System.out.println(reader + " no books borrowed");
+        });
+/*      We can implement this with this sql script
         """SELECT r.id, r.name, b.id, b.name, author
         FROM Reader r
         LEFT JOIN Borrow bor ON r.id = bor.reader_id
@@ -157,7 +167,16 @@ public class LibraryService {
     }
 
     public void showAllBooksWithTheirBorrowers() {
-/*      """SELECT r.id, r.name, b.id, b.name, author
+        List<Book> books = bookDaoJdbcImpl.findAll();
+        books.forEach((book) -> {
+            var readers = readerDaoJdbcImpl.findAllByBookId(book.getId());
+            if (readers.size() != 0) {
+                System.out.println(book + " borrowed by:");
+                readers.forEach(System.out::println);
+            } else System.out.println(book + " is available");
+        });
+/*      We can implement this with this sql script
+        """SELECT r.id, r.name, b.id, b.name, author
         FROM "Book" b
         LEFT JOIN "Borrow" bor ON b.id = bor.book_id
         LEFT JOIN "Reader" r ON bor.reader_id = r.id"""*/

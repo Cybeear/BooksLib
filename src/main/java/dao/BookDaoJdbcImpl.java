@@ -85,10 +85,10 @@ public class BookDaoJdbcImpl implements BookDao {
      */
     @Override
     public List<Book> findAllByReaderId(long readerId) {
-        var sql = "SELECT r.id, r.name FROM book b\n" +
+        var sql = "SELECT b.id, b.name, author FROM book b\n" +
                 "    LEFT JOIN borrow bor ON b.id = bor.book_id\n" +
                 "    LEFT JOIN reader r ON bor.reader_id = r.id\n" +
-                "WHERE b.id = ?";
+                "WHERE r.id = ?";
         List<Book> books = new ArrayList<>();
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(sql)) {
