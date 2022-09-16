@@ -1,7 +1,8 @@
 package dao;
 
 import entity.Reader;
-import service.ConnectionService;
+import service.ConnectionServicePostgresImpl;
+import service.ConnectionServiceInterface;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReaderDaoJdbcImpl implements ReaderDao {
-    private final ConnectionService connectionService = new ConnectionService();
+public class ReaderDaoPostgresqlImpl implements ReaderDao {
+    private final ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
 
     /**
      * @param reader

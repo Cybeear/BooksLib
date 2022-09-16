@@ -1,21 +1,17 @@
 package service;
 
-import dao.BookDaoJdbcImpl;
-import dao.BorrowDaoJdbcImpl;
-import dao.ReaderDaoJdbcImpl;
-
 import java.util.Scanner;
 
 public class MenuService {
     private final LibraryService libraryService;
+    private final Scanner in;
 
-    public MenuService(LibraryService libraryService) {
-        this.libraryService = libraryService;
+    public MenuService() {
+        libraryService = new LibraryService();
+        in = new Scanner(System.in);
     }
 
-    public void showMenu() {
-        Scanner in = new Scanner(System.in);
-
+    public void drawMenu() {
         var str = """
                 -----------------------------------------------------------------------------------------------------
                 | PLEASE, SELECT ONE OF THE FOLLOWING ACTIONS BY TYPING THE OPTION'S NUMBER AND PRESSING ENTER KEY:  |
@@ -32,6 +28,10 @@ public class MenuService {
                 |                             "TYPE 'exit' TO STOP THE PROGRAM AND EXIT!"                            |
                 -----------------------------------------------------------------------------------------------------""";
         System.out.println(str);
+    }
+
+    public void showMenu() {
+        drawMenu();
         String option = in.nextLine();
         switch (option) {
             case "1" -> libraryService.showAllBooks();
@@ -41,15 +41,15 @@ public class MenuService {
                 libraryService.registerReader(in.nextLine());
             }
             case "4" -> {
-                System.out.println("Please enter new book name and author separated by '/'. Like this: name / author");
+                System.out.println("Please enter new book name and author separated by '/'. Like this: name / author!");
                 libraryService.addBook(in.nextLine());
             }
             case "5" -> {
-                System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2");
+                System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2!");
                 libraryService.borrowABook(in.nextLine());
             }
             case "6" -> {
-                System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3");
+                System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3!");
                 libraryService.returnBorrowedBook(in.nextLine());
             }
             case "7" -> {
@@ -60,14 +60,10 @@ public class MenuService {
                 System.out.println("Please enter book id: ");
                 libraryService.showWhoBorrowByBookId(in.nextLine());
             }
-            case "9" -> {
-                libraryService.showAllReadersWithTheirBorrows();
-            }
-            case "10" -> {
-                libraryService.showAllBooksWithTheirBorrowers();
-            }
+            case "9" -> libraryService.showAllReadersWithTheirBorrows();
+            case "10" -> libraryService.showAllBooksWithTheirBorrowers();
             case "exit" -> System.exit(0);
-            default -> System.out.println("Program dont have this option");
+            default -> System.out.println("Program dont have this option!");
         }
     }
 }

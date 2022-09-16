@@ -76,6 +76,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book - id: " + id + "\tname: " + name + "\tauthor: " + author + ".";
+        return "book - id: " + id + "\tname: " + name + "\tauthor: " + author;
     }
 }

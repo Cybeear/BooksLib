@@ -40,7 +40,13 @@ public class Borrow {
 
     @Override
     public String toString() {
-        return "Reader: " + reader.toString() + "\t-\tborrow the book, " + book.toString();
+        if (reader == null) {
+            return "Book: " + book + " is available!";
+        } else if (book == null) {
+            return "Reader: " + reader + " has no borrowed books!";
+        } else {
+            return "Reader: " + reader + "\t-\tborrow the book, " + book;
+        }
     }
 
     @Override

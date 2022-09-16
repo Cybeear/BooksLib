@@ -3,14 +3,16 @@ package dao;
 import entity.Book;
 import entity.Borrow;
 import entity.Reader;
-import service.ConnectionService;
+import service.ConnectionServicePostgresImpl;
+import service.ConnectionServiceInterface;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BorrowDaoJdbcImpl implements BorrowDao {
-    private final ConnectionService connectionService = new ConnectionService();
+public class BorrowDaoPostgresqlImpl implements BorrowDao {
+    private final ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
 
     /**
      * @param bookId
@@ -61,8 +63,6 @@ public class BorrowDaoJdbcImpl implements BorrowDao {
             throw new RuntimeException("Failed to find borrowed data by reader Id"
                     + readerId + " and book Id: " + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
-
-
     }
 
     /**
@@ -169,5 +169,62 @@ public class BorrowDaoJdbcImpl implements BorrowDao {
         }
     }
 
+    /**
+     * @return 
+     */
+    public List<Borrow> findAllReadersWithTheirBorrows() {
+        List<Borrow> borrows = new ArrayList<>();
+        var sql = "SELECT r.id   AS reader_id, r.name AS reader_name, b.id   AS book_id, b.name AS book_name, b.author AS book_author\n" +
+                "FROM reader r LEFT JOIN borrow bor on r.id = bor.reader_id LEFT JOIN book b on b.id = bor.book_id\n" +
+                "ORDER BY reader_id";
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement(sql);
+             var resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Book book = null;
+                Reader reader = new Reader(resultSet.getLong(1),
+                        resultSet.getString(2));
+                if (resultSet.getLong("book_id") != 0) {
+                    book = new Book(resultSet.getLong(3),
+                            resultSet.getString(4),
+                            resultSet.getString(5));
+                }
+                borrows.add(new Borrow(book, reader));
 
+            }
+            return borrows;
+        } catch (SQLException sqlException) {
+            throw new RuntimeException("SqlError: " + sqlException.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * @return
+     */
+    public List<Borrow> findAllBooksWithTheirBorrowers() {
+        List<Borrow> borrows = new ArrayList<>();
+        var sql = "SELECT r.id   AS reader_id, r.name AS reader_name, b.id   AS book_id, b.name AS book_name, b.author AS book_author\n" +
+                "FROM book b LEFT JOIN borrow bor on b.id = bor.book_id LEFT JOIN reader r on r.id = bor.reader_id\n" +
+                "ORDER BY book_id";
+        try (var connection = connectionService.createConnection();
+             var statement = connection.prepareStatement(sql);
+             var resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Book book = new Book(resultSet.getLong(3),
+                        resultSet.getString(4),
+                        resultSet.getString(5));
+                Reader reader = null;
+                if (resultSet.getLong("reader_id") != 0) {
+                    reader = new Reader(resultSet.getLong(1),
+                            resultSet.getString(2));
+
+                }
+                borrows.add(new Borrow(book, reader));
+
+            }
+            return borrows;
+        } catch (SQLException sqlException) {
+            throw new RuntimeException("SqlError: " + sqlException.getLocalizedMessage());
+        }
+    }
 }

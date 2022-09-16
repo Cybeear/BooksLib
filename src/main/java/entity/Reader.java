@@ -61,6 +61,6 @@ public class Reader {
 
     @Override
     public String toString() {
-        return "Reader - id: " + id + "\tname: " + name;
+        return "reader - id: " + id + "\tname: " + name;
     }
 }

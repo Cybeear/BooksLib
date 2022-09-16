@@ -1,13 +1,9 @@
 package service;
 
-import dao.BookDaoJdbcImpl;
-import dao.BorrowDaoJdbcImpl;
-import dao.ReaderDaoJdbcImpl;
+import dao.*;
 import entity.Book;
 import entity.Borrow;
 import entity.Reader;
-
-import java.util.List;
 
 
 /**
@@ -15,37 +11,37 @@ import java.util.List;
  */
 public class LibraryService {
 
-    BookDaoJdbcImpl bookDaoJdbcImpl;
-    ReaderDaoJdbcImpl readerDaoJdbcImpl;
-    BorrowDaoJdbcImpl borrowDaoJdbcImpl;
-    ParserService parserService;
+    private BookDao bookDao;
+    private ReaderDao readerDao;
+    private BorrowDaoPostgresqlImpl borrowDao;
+    private ParserService parserService;
 
-    public LibraryService(BookDaoJdbcImpl bookDaoJdbcImpl, ReaderDaoJdbcImpl readerDaoJdbcImpl, BorrowDaoJdbcImpl borrowDaoJdbcImpl, ParserService parserService) {
-        this.bookDaoJdbcImpl = bookDaoJdbcImpl;
-        this.readerDaoJdbcImpl = readerDaoJdbcImpl;
-        this.borrowDaoJdbcImpl = borrowDaoJdbcImpl;
-        this.parserService = parserService;
+    public LibraryService() {
+        this.bookDao = new BookDaoPostgresqlImpl();
+        this.readerDao = new ReaderDaoPostgresqlImpl();
+        this.borrowDao = new BorrowDaoPostgresqlImpl();
+        this.parserService = new ParserService();
     }
 
     /**
      * Show all books in the list
      */
     public void showAllBooks() {
-        bookDaoJdbcImpl.findAll().forEach(System.out::println);
+        bookDao.findAll().forEach(System.out::println);
     }
 
     /**
      * Show all readers in the list
      */
     public void showAllReaders() {
-        readerDaoJdbcImpl.findAll().forEach(System.out::println);
+        readerDao.findAll().forEach(System.out::println);
     }
 
     /**
      * Add new reader to list
      */
     public void registerReader(String str) {
-        if (!str.equals(" ")) System.out.println(readerDaoJdbcImpl.save(new Reader(str)) + " successful registered!");
+        if (!str.equals(" ")) System.out.println(readerDao.save(new Reader(str)) + " successful registered!");
         else System.err.println("Error: enter a valid data!");
     }
 
@@ -54,13 +50,11 @@ public class LibraryService {
      */
     public void addBook(String str) {
         var inputSplit = str.split(" / ");
-        if (inputSplit.length < 2
-                || inputSplit[0].equals(" ")
-                || inputSplit[1].equals(" ")) {
-            System.err.println("Error: enter a valid data!");
+        if (parserService.checkSize(inputSplit) || inputSplit[0].equals(" ") || inputSplit[1].equals(" ")) {
+            System.err.println("Error: Please enter new book name and author separated by '/'. Like this: name / author!");
             return;
         }
-        System.out.println(bookDaoJdbcImpl.save(new Book(inputSplit[0], inputSplit[1])) + " successful added!");
+        System.out.println(bookDao.save(new Book(inputSplit[0], inputSplit[1])) + " successful added!");
     }
 
     /**
@@ -70,115 +64,96 @@ public class LibraryService {
      */
     public void borrowABook(String str) {
         var inputSplit = str.split(" / ");
-        if (inputSplit.length < 2) {
-            System.err.println("Error: enter a valid data!");
+        if (parserService.checkSize(inputSplit)) {
+            System.err.println("Error: enter a valid data. Like this: 4 / 2!");
             return;
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
         if (readerId == -1 || bookId == -1) {
-            System.err.println("Error: enter a valid data!");
+            System.err.println("Error: enter a valid data. Like this: 4 / 2!");
             return;
         }
-        var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
-        var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
+        var bookToBorrow = bookDao.findById(bookId);
+        var readerToBorrow = readerDao.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             var borrow = new Borrow(bookToBorrow.get(), readerToBorrow.get());
-            borrowDaoJdbcImpl.save(bookId, readerId);
+            borrowDao.save(bookId, readerId);
             System.out.println(borrow);
         } else System.err.println("Error: data is not exists!");
     }
 
     /**
-     * Function call parser function, show error message
-     * and return to menu if string of arguments contains any characters other than numbers
-     * delete object from borrowList if string not contains any characters other than numbers
+     * @param str Function call parser function, show error message
+     *            and return to menu if string of arguments contains any characters other than numbers
+     *            delete object from borrowList if string not contains any characters other than numbers
      */
     public void returnBorrowedBook(String str) {
         var inputSplit = str.split(" / ");
-        if (inputSplit.length < 2) {
-            System.err.println("Error: enter a valid data!");
+        if (parserService.checkSize(inputSplit)) {
+            System.err.println("Error: enter a valid data. Like this: 1 / 3!");
             return;
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
         if (readerId == -1 || bookId == -1) {
-            System.err.println("Error: enter a valid data!");
+            System.err.println("Error: enter a valid data. Like this: 1 / 3!");
             return;
         }
-        var bookToBorrow = bookDaoJdbcImpl.findById(bookId);
-        var readerToBorrow = readerDaoJdbcImpl.findById(readerId);
+        var bookToBorrow = bookDao.findById(bookId);
+        var readerToBorrow = readerDao.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
-            borrowDaoJdbcImpl.returnBook(bookId, readerId);
+            borrowDao.returnBook(bookId, readerId);
             System.out.println(bookToBorrow.get() + " is returned by " + readerToBorrow.get());
         } else System.err.println("Error: data is not exists");
     }
 
     /**
-     * Return to menu if string of arguments contains any symbols other than numbers or
-     * print all borrow objects by reader id
+     * @param str Return to menu if string of arguments contains any symbols other than numbers or
+     *            print all borrow objects by reader id
      */
     public void showAllBorrowedByReaderId(String str) {
         var parsed = parserService.parseLong(str);
         if (parsed == -1) {
-            System.err.println("Error: enter a valid data!");
+            System.err.println("Error: enter a valid data. Enter only digits!");
             return;
         }
-        var reader = readerDaoJdbcImpl.findById(parsed);
+        var reader = readerDao.findById(parsed);
         if (reader.isPresent()) {
-            var borrows = borrowDaoJdbcImpl.findAllBorrowedByReaderId(reader.get().getId());
+            var borrows = borrowDao.findAllBorrowedByReaderId(reader.get().getId());
             if (borrows.size() > 0) borrows.forEach(System.out::println);
         } else System.err.println("Error, this reader is not exist!");
     }
 
     /**
-     * Return to menu if string of arguments contains any symbols other than numbers or
-     * print who borrow book by book id
+     * @param str Return to menu if string of arguments contains any symbols other than numbers or
+     *            print who borrow book by book id
      */
     public void showWhoBorrowByBookId(String str) {
         var parsed = parserService.parseLong(str);
         if (parsed == -1) {
-            System.err.println("Error: enter a valid data!");
+            System.err.println("Error: enter a valid data. Enter only digits!");
             return;
         }
-        var book = bookDaoJdbcImpl.findById(parsed);
+        var book = bookDao.findById(parsed);
         if (book.isPresent()) {
-            var borrows = borrowDaoJdbcImpl.findAllBorrowedByBookId(book.get().getId());
+            var borrows = borrowDao.findAllBorrowedByBookId(book.get().getId());
             if (borrows.size() > 0) borrows.forEach(System.out::println);
             else System.err.println("Error: this book isn`t borrowed!");
         } else System.err.println("Error, this book is not exist!");
     }
 
+    /**
+     *
+     */
     public void showAllReadersWithTheirBorrows() {
-        List<Reader> readers = readerDaoJdbcImpl.findAll();
-        readers.forEach((reader) -> {
-            var borrowedBooks = bookDaoJdbcImpl.findAllByReaderId(reader.getId());
-            if (borrowedBooks.size() != 0) {
-                System.out.println(reader + " borrow the books:");
-                borrowedBooks.forEach(System.out::println);
-            } else System.out.println(reader + " no books borrowed");
-        });
-/*      We can implement this with this sql script
-        """SELECT r.id, r.name, b.id, b.name, author
-        FROM Reader r
-        LEFT JOIN Borrow bor ON r.id = bor.reader_id
-        LEFT JOIN Book b ON bor.book_id = b.id"""
-*/
+        borrowDao.findAllReadersWithTheirBorrows().forEach(System.out::println);
     }
 
+    /**
+     *
+     */
     public void showAllBooksWithTheirBorrowers() {
-        List<Book> books = bookDaoJdbcImpl.findAll();
-        books.forEach((book) -> {
-            var readers = readerDaoJdbcImpl.findAllByBookId(book.getId());
-            if (readers.size() != 0) {
-                System.out.println(book + " borrowed by:");
-                readers.forEach(System.out::println);
-            } else System.out.println(book + " is available");
-        });
-/*      We can implement this with this sql script
-        """SELECT r.id, r.name, b.id, b.name, author
-        FROM "Book" b
-        LEFT JOIN "Borrow" bor ON b.id = bor.book_id
-        LEFT JOIN "Reader" r ON bor.reader_id = r.id"""*/
+        borrowDao.findAllBooksWithTheirBorrowers().forEach(System.out::println);
     }
 }

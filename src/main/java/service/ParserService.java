@@ -3,6 +3,14 @@ package service;
 public class ParserService {
 
     /**
+     * @param array
+     * @return
+     */
+    public boolean checkSize(String[] array) {
+        return array.length < 2;
+    }
+
+    /**
      * @param str argument string
      * @return integer value -1 if string not contains only digits
      */
