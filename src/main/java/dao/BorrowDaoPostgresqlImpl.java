@@ -165,12 +165,12 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             statement.executeUpdate();
         } catch (SQLException sqlException) {
             throw new RuntimeException("Failed to return book with book Id:"
-                    + bookId + " and reader Id: " + readerId + "!\n" + sqlException.getMessage());
+                    + bookId + " and reader Id: " + readerId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
 
     /**
-     * @return 
+     * @return
      */
     public List<Borrow> findAllReadersWithTheirBorrows() {
         List<Borrow> borrows = new ArrayList<>();

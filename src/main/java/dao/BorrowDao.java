@@ -15,5 +15,9 @@ public interface BorrowDao {
 
     List<Borrow> findAllBorrowedByBookId(long bookId);
 
+    List<Borrow> findAllReadersWithTheirBorrows();
+
+    List<Borrow> findAllBooksWithTheirBorrowers();
+
     void returnBook(long bookId, long readerId);
 }

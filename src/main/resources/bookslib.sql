@@ -20,6 +20,8 @@ CREATE TABLE borrow
     id        SERIAL PRIMARY KEY,
     reader_id INTEGER NOT NULL,
     book_id   INTEGER NOT NULL,
-    CONSTRAINT FK_READER FOREIGN KEY (reader_id) REFERENCES reader (id),
-    CONSTRAINT FK_BOOK FOREIGN KEY (book_id) REFERENCES book (id)
+    CONSTRAINT FK_READER FOREIGN KEY (reader_id) REFERENCES reader (id) ON DELETE CASCADE,
+    CONSTRAINT FK_BOOK FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
+    CONSTRAINT Borrow_Unique UNIQUE (reader_id, book_id)
+        INCLUDE(reader_id, book_id)
 );

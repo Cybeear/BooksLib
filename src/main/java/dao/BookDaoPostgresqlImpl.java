@@ -11,7 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class BookDaoPostgresqlImpl implements BookDao {
-    private final ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
+    private ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
+
+    public ConnectionServiceInterface getConnectionService() {
+        return connectionService;
+    }
+
+    public void setConnectionService(ConnectionServiceInterface connectionService) {
+        this.connectionService = connectionService;
+    }
 
     /**
      * @param book
