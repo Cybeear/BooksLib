@@ -75,7 +75,11 @@ public class UIService {
 
     private void registerReader() {
         System.out.println("Please enter new reader full name!");
-        libraryService.registerReader(in.nextLine());
+        try {
+            System.out.println(libraryService.registerReader(in.nextLine()) + " successful registered!");
+        } catch (IllegalArgumentException illegalArgumentException) {
+            System.out.println(illegalArgumentException.getMessage());
+        }
     }
 
     private void addBook() {
@@ -91,7 +95,7 @@ public class UIService {
     private void borrowBook() {
         System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2!");
         try {
-            var borrow = libraryService.borrowABook(in.nextLine());
+            var borrow = libraryService.borrowBook(in.nextLine());
             if (borrow == null) System.err.println("Error: data is not exists!");
             else System.out.println(borrow);
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -102,7 +106,7 @@ public class UIService {
     private void returnBook() {
         System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3!");
         try {
-            var returned = libraryService.returnBorrowedBook(in.nextLine());
+            var returned = libraryService.returnBook(in.nextLine());
             if (!returned) System.err.println("Data is not exists!");
             else System.out.println("Book is returned!");
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -113,7 +117,7 @@ public class UIService {
     private void showAllBorrowedByReaderId() {
         System.out.println("Please enter reader id: ");
         try {
-            var borrows = libraryService.showAllBorrowedByReaderId(in.nextLine());
+            var borrows = libraryService.getAllBorrowedByReaderId(in.nextLine());
             if (borrows.size() > 0) borrows.forEach(System.out::println);
             else System.err.println("Error, this reader is not exist!");
         } catch (IllegalArgumentException illegalArgumentException) {
@@ -124,7 +128,7 @@ public class UIService {
     private void showWhoBorrowByBookId() {
         System.out.println("Please enter book id: ");
         try {
-            var borrows = libraryService.showWhoBorrowByBookId(in.nextLine());
+            var borrows = libraryService.getWhoBorrowByBookId(in.nextLine());
             if (borrows.size() > 0) borrows.forEach(System.out::println);
             else System.out.println("Error: this book isn`t borrowed!");
         } catch (IllegalArgumentException illegalArgumentException) {

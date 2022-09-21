@@ -18,7 +18,7 @@ class BookDaoPostgresqlImplTest {
     }
 
     @AfterEach
-    static void afterAll() {
+    void afterAll() {
         bookDao = new BookDaoPostgresqlImpl();
     }
 
@@ -37,7 +37,7 @@ class BookDaoPostgresqlImplTest {
     @Test
     void saveThenJdbcConnectionNull() {
         bookDao.setConnectionService(null);
-        assertThrows(SQLException.class, () -> bookDao.save(null),
+        assertThrows(RuntimeException.class, () -> bookDao.save(null),
                 "Test creation book if JDBC driver is null passed!");
 
     }
@@ -59,7 +59,7 @@ class BookDaoPostgresqlImplTest {
     void findByNotExistedId() {
         var book = bookDao.findById(1000000);
         assertAll(() -> assertFalse(book.isPresent()),
-                () -> assertNull(book.get()));
+                () -> assertTrue(book.isEmpty()));
     }
 
 

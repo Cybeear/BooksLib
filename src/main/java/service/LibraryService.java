@@ -5,7 +5,6 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -75,9 +74,9 @@ public class LibraryService {
     /**
      * Add new reader to list
      */
-    public void registerReader(String str) {
-        if (!str.equals(" ")) System.out.println(readerDao.save(new Reader(str)) + " successful registered!");
-        else System.err.println("Error: enter a valid data!");
+    public Reader registerReader(String str) {
+        if (!str.equals(" ")) return readerDao.save(new Reader(str));
+        else throw new IllegalArgumentException("Error: enter a valid data!");
     }
 
     /**
@@ -95,7 +94,7 @@ public class LibraryService {
      * and return to menu if string of arguments contains any characters other than numbers
      * add to borrowList if string not contains any characters other than numbers
      */
-    public Borrow borrowABook(String str) {
+    public Borrow borrowBook(String str) {
         var inputSplit = str.split(" / ");
         if (parserService.checkSize(inputSplit))
             throw new IllegalArgumentException("Error: enter a valid data of two arguments. Like this: 4 / 2!");
@@ -115,7 +114,7 @@ public class LibraryService {
      *            and return to menu if string of arguments contains any characters other than numbers
      *            delete object from borrowList if string not contains any characters other than numbers
      */
-    public boolean returnBorrowedBook(String str) {
+    public boolean returnBook(String str) {
         var inputSplit = str.split(" / ");
         if (parserService.checkSize(inputSplit))
             throw new IllegalArgumentException("Error: enter a valid data. Like this: 1 / 3!");
@@ -134,13 +133,12 @@ public class LibraryService {
      * @param str Return to menu if string of arguments contains any symbols other than numbers or
      *            print all borrow objects by reader id
      */
-    public List<Borrow> showAllBorrowedByReaderId(String str) {
+    public List<Borrow> getAllBorrowedByReaderId(String str) {
         var parsed = parserService.parseLong(str);
         if (parsed == -1) throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
         var reader = readerDao.findById(parsed);
-        if (reader.isPresent()) {
-            return borrowDao.findAllBorrowedByReaderId(reader.get().getId());
-        } else return new LinkedList<>();
+        if (reader.isPresent()) return borrowDao.findAllBorrowedByReaderId(reader.get().getId());
+        else throw new IllegalArgumentException("Error, this reader is not exist!");
 
     }
 
@@ -148,7 +146,7 @@ public class LibraryService {
      * @param str Return to menu if string of arguments contains any symbols other than numbers or
      *            print who borrow book by book id
      */
-    public List<Borrow> showWhoBorrowByBookId(String str) {
+    public List<Borrow> getWhoBorrowByBookId(String str) {
         var parsed = parserService.parseLong(str);
         if (parsed == -1) throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
         var book = bookDao.findById(parsed);
