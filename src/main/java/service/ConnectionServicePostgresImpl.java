@@ -10,7 +10,7 @@ public class ConnectionServicePostgresImpl implements ConnectionServiceInterface
     private String DB_PASS;
 
     public ConnectionServicePostgresImpl() {
-        DB_URL = "jdbc:postgresql://localhost:49155/bookslib";
+        DB_URL = "jdbc:postgresql://localhost:49153/bookslib";
         DB_USER = "postgres";
         DB_PASS = "postgrespw";
     }

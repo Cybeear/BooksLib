@@ -12,7 +12,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BorrowDaoPostgresqlImpl implements BorrowDao {
-    private final ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
+    private ConnectionServiceInterface connectionService;
+
+    public BorrowDaoPostgresqlImpl() {
+        connectionService = new ConnectionServicePostgresImpl();
+    }
+
+    public BorrowDaoPostgresqlImpl(ConnectionServiceInterface connectionService) {
+        this.connectionService = connectionService;
+    }
+
+    public ConnectionServiceInterface getConnectionService() {
+        return connectionService;
+    }
+
+    public void setConnectionService(ConnectionServiceInterface connectionService) {
+        this.connectionService = connectionService;
+    }
 
     /**
      * @param bookId

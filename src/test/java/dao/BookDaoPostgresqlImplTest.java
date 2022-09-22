@@ -39,7 +39,6 @@ class BookDaoPostgresqlImplTest {
         bookDao.setConnectionService(null);
         assertThrows(RuntimeException.class, () -> bookDao.save(null),
                 "Test creation book if JDBC driver is null passed!");
-
     }
 
     @Test

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Book {
     private static AtomicLong counter = new AtomicLong(1000L);
-
+    //UUID
     private long id;
 
     private String name;

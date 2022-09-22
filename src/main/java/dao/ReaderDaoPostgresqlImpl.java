@@ -11,7 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReaderDaoPostgresqlImpl implements ReaderDao {
-    private ConnectionServiceInterface connectionService = new ConnectionServicePostgresImpl();
+    private ConnectionServiceInterface connectionService;
+
+    public ReaderDaoPostgresqlImpl() {
+        connectionService = new ConnectionServicePostgresImpl();
+    }
+
+    public ReaderDaoPostgresqlImpl(ConnectionServiceInterface connectionService) {
+        this.connectionService = connectionService;
+    }
 
     public ConnectionServiceInterface getConnectionService() {
         return connectionService;

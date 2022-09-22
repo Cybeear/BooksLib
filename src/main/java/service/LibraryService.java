@@ -18,6 +18,13 @@ public class LibraryService {
     private BorrowDao borrowDao;
     private ParserService parserService;
 
+    public LibraryService(BookDao bookDao, ReaderDao readerDao, BorrowDao borrowDao, ParserService parserService) {
+        this.bookDao = bookDao;
+        this.readerDao = readerDao;
+        this.borrowDao = borrowDao;
+        this.parserService = parserService;
+    }
+
     public LibraryService() {
         this.bookDao = new BookDaoPostgresqlImpl();
         this.readerDao = new ReaderDaoPostgresqlImpl();
@@ -95,6 +102,7 @@ public class LibraryService {
      * add to borrowList if string not contains any characters other than numbers
      */
     public Borrow borrowBook(String str) {
+        //вынести в переменную
         var inputSplit = str.split(" / ");
         if (parserService.checkSize(inputSplit))
             throw new IllegalArgumentException("Error: enter a valid data of two arguments. Like this: 4 / 2!");
@@ -104,9 +112,8 @@ public class LibraryService {
         var bookToBorrow = bookDao.findById(bookId);
         var readerToBorrow = readerDao.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
-            var borrow = new Borrow(bookToBorrow.get(), readerToBorrow.get());
             return borrowDao.save(bookId, readerId);
-        } else return new Borrow(null, null);
+        } else throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
     }
 
     /**
@@ -126,7 +133,7 @@ public class LibraryService {
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             borrowDao.returnBook(bookId, readerId);
             return true;
-        } else return false;
+        } else throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
     }
 
     /**
