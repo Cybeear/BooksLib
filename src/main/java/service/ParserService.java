@@ -11,6 +11,14 @@ public class ParserService {
     }
 
     /**
+     * @param data
+     * @return
+     */
+    public boolean checkString(String data) {
+        return data.equals(" ");
+    }
+
+    /**
      * @param str argument string
      * @return integer value -1 if string not contains only digits
      */

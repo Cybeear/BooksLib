@@ -76,75 +76,102 @@ public class UIService {
     private void registerReader() {
         System.out.println("Please enter new reader full name!");
         try {
-            System.out.println(libraryService.registerReader(in.nextLine()) + " successful registered!");
+            var newReaderName = in.nextLine();
+            var reader = libraryService.registerReader(newReaderName);
+            System.out.println(reader + " successful registered!");
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
+            System.err.println(illegalArgumentException.getMessage());
         }
     }
 
     private void addBook() {
         System.out.println("Please enter new book name and author separated by '/'. Like this: name / author!");
         try {
-            var book = libraryService.addBook(in.nextLine());
+            var newBookData = in.nextLine();
+            var book = libraryService.addBook(newBookData);
             System.out.println(book + " successful added!");
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println("Error: Please enter new book name and author separated by '/'. Like this: name / author!");
+            System.err.println("Error: Please enter new book name and author separated by '/'. Like this: name / author!");
+        } catch (NullPointerException nullPointerException) {
+            System.err.println("Error: " + nullPointerException.getMessage());
         }
     }
 
     private void borrowBook() {
         System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2!");
         try {
-            var borrow = libraryService.borrowBook(in.nextLine());
-            if (borrow == null) System.err.println("Error: data is not exists!");
-            else System.out.println(borrow);
+            var readeAndBookIds = in.nextLine();
+            var borrow = libraryService.borrowBook(readeAndBookIds);
+            if (borrow != null) {
+                System.out.println(borrow);
+            } else {
+                System.err.println("Error: data is not exists!");
+            }
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
+            System.err.println(illegalArgumentException.getMessage());
         }
     }
 
     private void returnBook() {
         System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3!");
         try {
-            var returned = libraryService.returnBook(in.nextLine());
-            if (!returned) System.err.println("Data is not exists!");
-            else System.out.println("Book is returned!");
+            var readeAndBookIds = in.nextLine();
+            var returned = libraryService.returnBook(readeAndBookIds);
+            if (!returned) {
+                System.err.println("Data is not exists!");
+            } else {
+                System.out.println("Book is returned!");
+            }
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
+            System.err.println(illegalArgumentException.getMessage());
         }
     }
 
     private void showAllBorrowedByReaderId() {
         System.out.println("Please enter reader id: ");
         try {
-            var borrows = libraryService.getAllBorrowedByReaderId(in.nextLine());
-            if (borrows.size() > 0) borrows.forEach(System.out::println);
-            else System.err.println("Error, this reader is not exist!");
+            var readerId = in.nextLine();
+            var borrows = libraryService.getAllBorrowedByReaderId(readerId);
+            if (!borrows.isEmpty()) {
+                borrows.forEach(System.out::println);
+            } else {
+                System.err.println("Error, this reader is not exist!");
+            }
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
+            System.err.println(illegalArgumentException.getMessage());
         }
     }
 
     private void showWhoBorrowByBookId() {
         System.out.println("Please enter book id: ");
         try {
-            var borrows = libraryService.getWhoBorrowByBookId(in.nextLine());
-            if (borrows.size() > 0) borrows.forEach(System.out::println);
-            else System.out.println("Error: this book isn`t borrowed!");
+            var bookId = in.nextLine();
+            var borrows = libraryService.getWhoBorrowByBookId(bookId);
+            if (!borrows.isEmpty()) {
+                borrows.forEach(System.out::println);
+            } else {
+                System.err.println("Error: this book isn`t borrowed!");
+            }
         } catch (IllegalArgumentException illegalArgumentException) {
-            System.out.println(illegalArgumentException.getMessage());
+            System.err.println(illegalArgumentException.getMessage());
         }
     }
 
     private void showAllReadersWithTheirBorrows() {
         var borrows = libraryService.getAllReadersWithTheirBorrows();
-        if (borrows.size() > 0) borrows.forEach(System.out::println);
-        else System.out.println("Database is empty!");
+        if (!borrows.isEmpty()) {
+            borrows.forEach(System.out::println);
+        } else {
+            System.err.println("Database is empty!");
+        }
     }
 
     private void showAllBooksWithTheirBorrowers() {
         var borrows = libraryService.getAllBooksWithTheirBorrowers();
-        if (borrows.size() > 0) borrows.forEach(System.out::println);
-        else System.out.println("Database is empty!");
+        if (!borrows.isEmpty()) {
+            borrows.forEach(System.out::println);
+        } else {
+            System.err.println("Database is empty!");
+        }
     }
 }

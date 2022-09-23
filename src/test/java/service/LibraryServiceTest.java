@@ -3,11 +3,13 @@ package service;
 import dao.*;
 import entity.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,133 +24,156 @@ class LibraryServiceTest {
 
     @BeforeEach
     void setUp() {
-        bookDao = spy(BookDaoPostgresqlImpl.class);
-        readerDao = spy(ReaderDaoPostgresqlImpl.class);
-        borrowDao = spy(BorrowDaoPostgresqlImpl.class);
+        bookDao = mock(BookDaoPostgresqlImpl.class);
+        readerDao = mock(ReaderDaoPostgresqlImpl.class);
+        borrowDao = mock(BorrowDaoPostgresqlImpl.class);
         libraryService = new LibraryService();
         libraryService.setBookDao(bookDao);
         libraryService.setReaderDao(readerDao);
         libraryService.setBorrowDao(borrowDao);
     }
 
+    @DisplayName("Test adding new reader with correct data")
     @Test
     void registerReaderWithCorrectData() {
         var reader = new Reader("name");
+        Mockito.doReturn(reader).when(readerDao).save(reader);
         var returnedReader = libraryService.registerReader("name");
-        Mockito.doReturn(reader).when(readerDao).save(returnedReader);
-        verify(readerDao, times(1)).save(returnedReader);
         assertAll(() -> assertNotNull(returnedReader),
-                () -> assertNotEquals(returnedReader.getId(), reader.getId()),
-                () -> assertEquals("name", reader.getName()));
+                () -> assertEquals(returnedReader, reader),
+                () -> verify(readerDao, times(1)).save(returnedReader));
     }
 
+    @DisplayName("Test adding new reader with incorrect data")
     @Test
     void registerReaderWithInCorrectData() {
-        assertThrows(IllegalArgumentException.class, () ->
-                Mockito.when(libraryService.registerReader(" ")).thenThrow(IllegalArgumentException.class));
-        verify(readerDao, never()).save(any());
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.registerReader(" ")),
+                () -> verify(readerDao, never()).save(any()));
     }
 
+    @DisplayName("Test adding new book with correct data")
     @Test
     void addBookWithCorrectData() {
         var book = new Book("name", "author");
+        Mockito.doReturn(book).when(bookDao).save(book);
         var returnedBook = libraryService.addBook("name / author");
-        Mockito.doReturn(book).when(bookDao).save(returnedBook);
-        verify(bookDao, times(1)).save(returnedBook);
         assertAll(() -> assertNotNull(returnedBook),
-                () -> assertNotEquals(returnedBook.getId(), book.getId()),
-                () -> assertEquals(returnedBook.getName(), book.getName()),
-                () -> assertEquals(returnedBook.getAuthor(), book.getAuthor()));
+                () -> assertEquals(returnedBook, book),
+                () -> verify(bookDao, times(1)).save(any()));
     }
 
+    @DisplayName("Test adding new book with incorrect data")
     @Test
     void addBookWithInCorrectData() {
-        assertThrows(IllegalArgumentException.class, () ->
-                Mockito.when(libraryService.addBook("name")).thenThrow(IllegalArgumentException.class));
-        verify(bookDao, never()).save(any());
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.addBook("name")),
+                () -> verify(bookDao, never()).save(any()));
+
     }
 
+    @DisplayName("Test borrow a book method with correct data")
     @Test
     void borrowBookWithCorrectData() {
-        Borrow borrow = new Borrow(new Book(5, "test4", "test4"), new Reader(5, "test4"));
-        Mockito.when(libraryService.borrowBook("5 / 5")).thenReturn(borrow);
-        assertAll(() -> assertNotNull(borrow),
-                () -> assertEquals(new Book(5, "test4", "test4"), borrow.getBook()),
-                () -> assertEquals(new Reader(5, "test4"), borrow.getReader()));
+        var reader = new Reader(5, "test4");
+        var book = new Book(5, "test4", "test4");
+        var borrow = new Borrow(book, reader);
+        Mockito.doReturn(Optional.of(reader)).when(readerDao).findById(anyLong());
+        Mockito.doReturn(Optional.of(book)).when(bookDao).findById(anyLong());
+        Mockito.doReturn(borrow).when(borrowDao).save(anyLong(), anyLong());
+        var returnedBorrow = libraryService.borrowBook("5 / 5");
+        assertAll(() -> assertNotNull(returnedBorrow),
+                () -> assertEquals(returnedBorrow, borrow),
+                () -> verify(readerDao, times(1)).findById(anyLong()),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, times(1)).save(anyLong(), anyLong()));
     }
 
+    @DisplayName("Test borrow a book method with incorrect data")
     @Test
     void borrowBookWithInCorrectData() {
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.borrowBook("999 / 999")).thenThrow(IllegalArgumentException.class)),
-                () -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.borrowBook("99")).thenThrow(IllegalArgumentException.class)));
-        verify(readerDao, times(1)).findById(anyLong());
-        verify(bookDao, times(1)).findById(anyLong());
+        Mockito.doReturn(Optional.ofNullable(null)).when(readerDao).findById(anyLong());
+        Mockito.doReturn(Optional.ofNullable(null)).when(bookDao).findById(anyLong());
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.borrowBook("999 / 999")),
+                () -> assertThrows(IllegalArgumentException.class, () -> libraryService.borrowBook("99")),
+                () -> verify(readerDao, times(1)).findById(anyLong()),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, never()).save(anyLong(), anyLong()));
     }
 
+    @DisplayName("Test return a book method with correct data")
     @Test
     void returnBookWithCorrectData() {
-        assertTrue(libraryService.returnBook("2 / 1"));
-        verify(borrowDao, times(1)).returnBook(anyLong(), anyLong());
+        var reader = new Reader(2L, "test1");
+        var book = new Book(1L, "test", "test");
+        Mockito.doReturn(Optional.of(reader)).when(readerDao).findById(anyLong());
+        Mockito.doReturn(Optional.of(book)).when(bookDao).findById(anyLong());
+        assertAll(() -> assertTrue(libraryService.returnBook("2 / 1")),
+                () -> verify(readerDao, times(1)).findById(anyLong()),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, times(1)).returnBook(anyLong(), anyLong()));
     }
 
+    @DisplayName("Test return a book method with incorrect data")
     @Test
     void returnBookWithInCorrectData() {
+        Mockito.doReturn(Optional.ofNullable(null)).when(readerDao).findById(anyLong());
+        Mockito.doReturn(Optional.ofNullable(null)).when(bookDao).findById(anyLong());
         assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.returnBook("5")),
-                () -> assertThrows(IllegalArgumentException.class, () -> libraryService.returnBook("9999 / 9789")));
+                () -> assertThrows(IllegalArgumentException.class, () -> libraryService.returnBook("9999 / 9789")),
+                () -> verify(readerDao, times(1)).findById(anyLong()),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, never()).returnBook(anyLong(), anyLong()));
     }
 
+    @DisplayName("Test get all borrows by reader id with correct data")
     @Test
     void getAllBorrowedByExistedReaderId() {
+        var reader = new Reader(1, "test");
         List<Borrow> borrows = new LinkedList<>() {{
-            add(new Borrow(new Book(1, "test", "test"), new Reader(1, "test")));
-            add(new Borrow(new Book(2, "test1", "test1"), new Reader(1, "test")));
+            add(new Borrow(new Book(1, "test", "test"), reader));
+            add(new Borrow(new Book(2, "test1", "test1"), reader));
         }};
+        Mockito.doReturn(Optional.of(reader)).when(readerDao).findById(anyLong());
+        Mockito.doReturn(borrows).when(borrowDao).findAllBorrowedByReaderId(anyLong());
         var returnedBorrows = libraryService.getAllBorrowedByReaderId("1");
-        Mockito.doReturn(returnedBorrows).when(borrowDao).findAllBorrowedByReaderId(anyLong());
-        verify(borrowDao, times(1)).findAllBorrowedByReaderId(anyLong());
-        assertAll(() -> assertEquals(2, returnedBorrows.size()),
-                () -> assertEquals(borrows, returnedBorrows));
+        assertAll(() -> assertFalse(returnedBorrows.isEmpty()),
+                () -> assertEquals(borrows, returnedBorrows),
+                () -> verify(borrowDao, times(1)).findAllBorrowedByReaderId(anyLong()));
     }
 
+    @DisplayName("Test get all borrows by reader id with incorrect data")
     @Test
     void getAllBorrowedByNotExistedReaderId() {
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.getAllBorrowedByReaderId("999"))
-                                .thenThrow(IllegalArgumentException.class)),
-                () -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.getAllBorrowedByReaderId("qwer"))
-                                .thenThrow(IllegalArgumentException.class))
-        );
-        verify(readerDao, times(1)).findById(anyLong());
-        verify(borrowDao, never()).findAllBorrowedByReaderId(anyLong());
+        Mockito.doReturn(Optional.ofNullable(null)).when(readerDao).findById(anyLong());
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.getAllBorrowedByReaderId("999")),
+                () -> assertThrows(IllegalArgumentException.class, () -> libraryService.getAllBorrowedByReaderId("test")),
+                () -> verify(readerDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, never()).findAllBorrowedByReaderId(anyLong()));
     }
 
+    @DisplayName("Test get all borrows by book id with correct data")
     @Test
     void getWhoBorrowByExistedBookId() {
+        var book = new Book(4, "test3", "test3");
         List<Borrow> borrows = new LinkedList<>() {{
-            add(new Borrow(new Book(4, "test3", "test3"), new Reader(2, "test1")));
-            add(new Borrow(new Book(4, "test3", "test3"), new Reader(4, "test3")));
+            add(new Borrow(book, new Reader(2, "test1")));
+            add(new Borrow(book, new Reader(4, "test3")));
         }};
+        Mockito.doReturn(Optional.of(book)).when(bookDao).findById(anyLong());
+        Mockito.doReturn(borrows).when(borrowDao).findAllBorrowedByBookId(anyLong());
         var returnedBorrows = libraryService.getWhoBorrowByBookId("4");
-        Mockito.doReturn(returnedBorrows).when(borrowDao).findAllBorrowedByBookId(anyLong());
-        verify(bookDao, times(1)).findById(anyLong());
-        verify(borrowDao, times(1)).findAllBorrowedByBookId(anyLong());
         assertAll(() -> assertEquals(2, returnedBorrows.size()),
-                () -> assertEquals(borrows, returnedBorrows));
+                () -> assertEquals(borrows, returnedBorrows),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, times(1)).findAllBorrowedByBookId(anyLong()));
     }
 
+    @DisplayName("Test get all borrows by book id with incorrect data")
     @Test
     void getWhoBorrowByNotExistedBookId() {
-        assertAll(() -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.getWhoBorrowByBookId("999"))
-                                .thenThrow(IllegalArgumentException.class)),
-                () -> assertThrows(IllegalArgumentException.class, () ->
-                        Mockito.when(libraryService.getWhoBorrowByBookId("qwer"))
-                                .thenThrow(IllegalArgumentException.class))
-        );
-        verify(bookDao, times(1)).findById(anyLong());
-        verify(borrowDao, never()).findAllBorrowedByBookId(anyLong());
+        Mockito.doReturn(Optional.ofNullable(null)).when(bookDao).findById(anyLong());
+        assertAll(() -> assertThrows(IllegalArgumentException.class, () -> libraryService.getWhoBorrowByBookId("999")),
+                () -> assertThrows(IllegalArgumentException.class, () -> libraryService.getWhoBorrowByBookId("test")),
+                () -> verify(bookDao, times(1)).findById(anyLong()),
+                () -> verify(borrowDao, never()).findAllBorrowedByBookId(anyLong()));
     }
 }

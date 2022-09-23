@@ -3,48 +3,40 @@ package dao;
 import entity.Book;
 import org.junit.jupiter.api.*;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class BookDaoPostgresqlImplTest {
 
-    private static BookDaoPostgresqlImpl bookDao;
+    private BookDao bookDao;
 
-    @BeforeAll
-    static void beforeAll() {
-        bookDao = new BookDaoPostgresqlImpl();
-    }
-
-    @AfterEach
-    void afterAll() {
+    @BeforeEach
+    void beforeEach() {
         bookDao = new BookDaoPostgresqlImpl();
     }
 
     @Test
     void saveThenBookNotNull() {
         Book book = new Book("test", "test");
-        assertNotNull(bookDao.save(book), "Test creation book passed!");
+        assertNotNull(bookDao.save(book), "DAO can not return (book == null) after successful save to DB!");
     }
 
     @Test
     void saveThenBookNull() {
         assertThrows(NullPointerException.class, () -> bookDao.save(null),
-                "Test creation book is null passed!");
+                "DAO can not throw exception after receive null to function!");
     }
 
     @Test
     void saveThenJdbcConnectionNull() {
-        bookDao.setConnectionService(null);
+        bookDao = new BookDaoPostgresqlImpl(null);
         assertThrows(RuntimeException.class, () -> bookDao.save(null),
-                "Test creation book if JDBC driver is null passed!");
+                "DAO can not throw SqlException in RuntimeException if JDBC driver is null!");
     }
 
     @Test
     void findAllIfDatabaseNotEmpty() {
         var books = bookDao.findAll();
-        assertNotEquals(new ArrayList<Book>(), books);
+        assertFalse(books.isEmpty());
     }
 
     @Test

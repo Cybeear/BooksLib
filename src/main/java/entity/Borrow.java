@@ -8,11 +8,11 @@ public class Borrow {
     private Book book;
 
     /**
-     * @param books  Book object field
+     * @param book  Book object field
      * @param reader Reader object field
      */
-    public Borrow(Book books, Reader reader) {
-        this.book = books;
+    public Borrow(Book book, Reader reader) {
+        this.book = book;
         this.reader = reader;
     }
 

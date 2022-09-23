@@ -81,19 +81,25 @@ public class LibraryService {
     /**
      * Add new reader to list
      */
-    public Reader registerReader(String str) {
-        if (!str.equals(" ")) return readerDao.save(new Reader(str));
-        else throw new IllegalArgumentException("Error: enter a valid data!");
+    public Reader registerReader(String newReaderName) {
+        if (!parserService.checkString(newReaderName)) {
+            return readerDao.save(new Reader(newReaderName));
+        } else {
+            throw new IllegalArgumentException("Failed to create new reader: reader name can not be an empty string!");
+        }
     }
 
     /**
      * Add new book to list
      */
-    public Book addBook(String str) {
-        var inputSplit = str.split(" / ");
-        if (parserService.checkSize(inputSplit) || inputSplit[0].equals(" ") || inputSplit[1].equals(" "))
-            throw new IllegalArgumentException("");
-        else return bookDao.save(new Book(inputSplit[0], inputSplit[1]));
+    public Book addBook(String newBookData) {
+        var inputSplit = newBookData.split(" / ");
+        if (parserService.checkSize(inputSplit) || parserService.checkString(inputSplit[0])
+                || parserService.checkString(inputSplit[1])) {
+            throw new IllegalArgumentException("Failed to create new book: your input is incorrect or an empty string!");
+        } else {
+            return bookDao.save(new Book(inputSplit[0], inputSplit[1]));
+        }
     }
 
     /**
@@ -101,64 +107,86 @@ public class LibraryService {
      * and return to menu if string of arguments contains any characters other than numbers
      * add to borrowList if string not contains any characters other than numbers
      */
-    public Borrow borrowBook(String str) {
-        //вынести в переменную
-        var inputSplit = str.split(" / ");
-        if (parserService.checkSize(inputSplit))
+    public Borrow borrowBook(String readerAndBookIds) {
+        //Можно вынести в отдельную переменную, много дублирующегося кода.
+        var inputSplit = readerAndBookIds.split(" / ");
+        if (parserService.checkSize(inputSplit)) {
             throw new IllegalArgumentException("Error: enter a valid data of two arguments. Like this: 4 / 2!");
+        }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
-        if (readerId == -1 || bookId == -1) throw new IllegalArgumentException("Error: enter only digits!");
+        if (readerId == -1 || bookId == -1) {
+            throw new IllegalArgumentException("Error: enter only digits!");
+        }
         var bookToBorrow = bookDao.findById(bookId);
         var readerToBorrow = readerDao.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             return borrowDao.save(bookId, readerId);
-        } else throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
+        } else {
+            throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
+        }
     }
 
     /**
-     * @param str Function call parser function, show error message
-     *            and return to menu if string of arguments contains any characters other than numbers
-     *            delete object from borrowList if string not contains any characters other than numbers
+     * @param readerAndBookIds Function call parser function, show error message
+     *                         and return to menu if string of arguments contains any characters other than numbers
+     *                         delete object from borrowList if string not contains any characters other than numbers
+     * @return
      */
-    public boolean returnBook(String str) {
-        var inputSplit = str.split(" / ");
-        if (parserService.checkSize(inputSplit))
+    public boolean returnBook(String readerAndBookIds) {
+        var inputSplit = readerAndBookIds.split(" / ");
+        if (parserService.checkSize(inputSplit)) {
             throw new IllegalArgumentException("Error: enter a valid data. Like this: 1 / 3!");
+        }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
-        if (readerId == -1 || bookId == -1) return false;
+        if (readerId == -1 || bookId == -1) {
+            return false;
+        }
         var bookToBorrow = bookDao.findById(bookId);
         var readerToBorrow = readerDao.findById(readerId);
         if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
             borrowDao.returnBook(bookId, readerId);
             return true;
-        } else throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
+        } else {
+            throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
+        }
     }
 
     /**
-     * @param str Return to menu if string of arguments contains any symbols other than numbers or
-     *            print all borrow objects by reader id
+     * @param readerId Return to menu if string of arguments contains any symbols other than numbers or
+     *                 print all borrow objects by reader id
+     * @return
      */
-    public List<Borrow> getAllBorrowedByReaderId(String str) {
-        var parsed = parserService.parseLong(str);
-        if (parsed == -1) throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
+    public List<Borrow> getAllBorrowedByReaderId(String readerId) {
+        var parsed = parserService.parseLong(readerId);
+        if (parsed == -1) {
+            throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
+        }
         var reader = readerDao.findById(parsed);
-        if (reader.isPresent()) return borrowDao.findAllBorrowedByReaderId(reader.get().getId());
-        else throw new IllegalArgumentException("Error, this reader is not exist!");
-
+        if (reader.isPresent()) {
+            return borrowDao.findAllBorrowedByReaderId(reader.get().getId());
+        } else {
+            throw new IllegalArgumentException("Error, this reader is not exist!");
+        }
     }
 
     /**
-     * @param str Return to menu if string of arguments contains any symbols other than numbers or
-     *            print who borrow book by book id
+     * @param bookId
+     * @return Return to menu if string of arguments contains any symbols other than numbers or
+     * print who borrow book by book id
      */
-    public List<Borrow> getWhoBorrowByBookId(String str) {
-        var parsed = parserService.parseLong(str);
-        if (parsed == -1) throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
+    public List<Borrow> getWhoBorrowByBookId(String bookId) {
+        var parsed = parserService.parseLong(bookId);
+        if (parsed == -1) {
+            throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
+        }
         var book = bookDao.findById(parsed);
-        if (book.isPresent()) return borrowDao.findAllBorrowedByBookId(book.get().getId());
-        else throw new IllegalArgumentException("Error, this book is not exist!");
+        if (book.isPresent()) {
+            return borrowDao.findAllBorrowedByBookId(book.get().getId());
+        } else {
+            throw new IllegalArgumentException("Error, this book is not exist!");
+        }
     }
 
     /**

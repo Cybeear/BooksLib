@@ -21,14 +21,6 @@ public class BookDaoPostgresqlImpl implements BookDao {
         this.connectionService = connectionService;
     }
 
-    public ConnectionServiceInterface getConnectionService() {
-        return connectionService;
-    }
-
-    public void setConnectionService(ConnectionServiceInterface connectionService) {
-        this.connectionService = connectionService;
-    }
-
     /**
      * @param book
      * @return
@@ -42,12 +34,17 @@ public class BookDaoPostgresqlImpl implements BookDao {
             statement.setString(2, book.getAuthor());
             statement.executeUpdate();
             var resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) book.setId(resultSet.getLong(1));
+            if (resultSet.next()) {
+                book.setId(resultSet.getLong(1));
+            }
             resultSet.close();
             return book;
         } catch (SQLException sqlException) {
             throw new RuntimeException("Failed to save book [" + book + "]!\n" +
                     sqlException.getLocalizedMessage());
+        } catch (NullPointerException nullPointerException) {
+            throw new NullPointerException("Failed to save book, the function is waiting book object but receive null!\n" +
+                    nullPointerException.getLocalizedMessage());
         }
     }
 
@@ -102,10 +99,14 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public List<Book> findAllByReaderId(long readerId) {
-        var sql = "SELECT b.id, b.name, author FROM book b\n" +
-                "    LEFT JOIN borrow bor ON b.id = bor.book_id\n" +
-                "    LEFT JOIN reader r ON bor.reader_id = r.id\n" +
-                "WHERE r.id = ?";
+        var sql = """
+                SELECT
+                b.id,
+                b.name,
+                b.author
+                FROM book b
+                    LEFT JOIN borrow bor ON b.id = bor.book_id
+                WHERE bor.reader_id = ?""";
         List<Book> books = new ArrayList<>();
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(sql)) {

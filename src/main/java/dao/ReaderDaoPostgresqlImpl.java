@@ -21,14 +21,6 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
         this.connectionService = connectionService;
     }
 
-    public ConnectionServiceInterface getConnectionService() {
-        return connectionService;
-    }
-
-    public void setConnectionService(ConnectionServiceInterface connectionService) {
-        this.connectionService = connectionService;
-    }
-
     /**
      * @param reader
      * @return
@@ -102,10 +94,13 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
      */
     @Override
     public List<Reader> findAllByBookId(long bookId) {
-        var sql = "SELECT r.id, r.name FROM reader r\n" +
-                "    LEFT JOIN borrow bor ON r.id = bor.reader_id\n" +
-                "    LEFT JOIN book b ON bor.book_id = b.id\n" +
-                "WHERE b.id = ?";
+        var sql = """
+                SELECT
+                r.id,
+                r.name
+                FROM reader r
+                    LEFT JOIN borrow bor ON r.id = bor.reader_id
+                WHERE bor.book_id = ?""";
         List<Reader> readers = new ArrayList<>();
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(sql)) {

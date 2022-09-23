@@ -2,7 +2,7 @@ package service;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ParserServiceTest {
 
@@ -21,5 +21,15 @@ class ParserServiceTest {
     @Test
     void parseIntWithFloatNumberInString() {
         assertEquals(-1, parserService.parseLong("423.42"));
+    }
+
+    @Test
+    void checkStringIfStringIsNotEmpty() {
+        assertFalse(parserService.checkString("test string"));
+    }
+
+    @Test
+    void checkStringIfStringIsEmpty() {
+        assertTrue(parserService.checkString(" "));
     }
 }
