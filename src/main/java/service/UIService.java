@@ -131,9 +131,9 @@ public class UIService {
         System.out.println("Please enter reader id: ");
         try {
             var readerId = in.nextLine();
-            var borrows = libraryService.getAllBorrowedByReaderId(readerId);
-            if (!borrows.isEmpty()) {
-                borrows.forEach(System.out::println);
+            var readers = libraryService.getAllBorrowedByReaderId(readerId);
+            if (!readers.isEmpty()) {
+                readers.forEach(System.out::println);
             } else {
                 System.err.println("Error, this reader is not exist!");
             }
@@ -146,9 +146,9 @@ public class UIService {
         System.out.println("Please enter book id: ");
         try {
             var bookId = in.nextLine();
-            var borrows = libraryService.getWhoBorrowByBookId(bookId);
-            if (!borrows.isEmpty()) {
-                borrows.forEach(System.out::println);
+            var readers = libraryService.getWhoBorrowByBookId(bookId);
+            if (!readers.isEmpty()) {
+                readers.forEach(System.out::println);
             } else {
                 System.err.println("Error: this book isn`t borrowed!");
             }

@@ -158,14 +158,14 @@ public class LibraryService {
      *                 print all borrow objects by reader id
      * @return
      */
-    public List<Borrow> getAllBorrowedByReaderId(String readerId) {
+    public List<Book> getAllBorrowedByReaderId(String readerId) {
         var parsed = parserService.parseLong(readerId);
         if (parsed == -1) {
             throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
         }
-        var reader = readerDao.findById(parsed);
-        if (reader.isPresent()) {
-            return borrowDao.findAllBorrowedByReaderId(reader.get().getId());
+        var books = bookDao.findAllByReaderId(parsed);
+        if (!books.isEmpty()) {
+            return books;
         } else {
             throw new IllegalArgumentException("Error, this reader is not exist!");
         }
@@ -176,14 +176,14 @@ public class LibraryService {
      * @return Return to menu if string of arguments contains any symbols other than numbers or
      * print who borrow book by book id
      */
-    public List<Borrow> getWhoBorrowByBookId(String bookId) {
+    public List<Reader> getWhoBorrowByBookId(String bookId) {
         var parsed = parserService.parseLong(bookId);
         if (parsed == -1) {
             throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
         }
-        var book = bookDao.findById(parsed);
-        if (book.isPresent()) {
-            return borrowDao.findAllBorrowedByBookId(book.get().getId());
+        var readers = readerDao.findAllByBookId(parsed);
+        if (!readers.isEmpty()) {
+            return readers;
         } else {
             throw new IllegalArgumentException("Error, this book is not exist!");
         }
