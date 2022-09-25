@@ -105,10 +105,10 @@ public class UIService {
             if (borrow != null) {
                 System.out.println(borrow);
             } else {
-                System.err.println("Error: data is not exists!");
+                System.err.println("Error: book or reader is not exists!");
             }
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println(illegalArgumentException.getMessage());
+        } catch (RuntimeException runtimeException) {
+            System.err.println(runtimeException.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public class UIService {
             if (!readers.isEmpty()) {
                 readers.forEach(System.out::println);
             } else {
-                System.err.println("Error, this reader is not exist!");
+                System.err.println("Error, this reader is not exist or does not borrow any book!");
             }
         } catch (IllegalArgumentException illegalArgumentException) {
             System.err.println(illegalArgumentException.getMessage());
@@ -162,7 +162,7 @@ public class UIService {
         if (!borrows.isEmpty()) {
             borrows.forEach(System.out::println);
         } else {
-            System.err.println("Database is empty!");
+            System.err.println("No active readers at the moment!");
         }
     }
 
@@ -171,7 +171,7 @@ public class UIService {
         if (!borrows.isEmpty()) {
             borrows.forEach(System.out::println);
         } else {
-            System.err.println("Database is empty!");
+            System.err.println("At the moment no books are borrowed!");
         }
     }
 }

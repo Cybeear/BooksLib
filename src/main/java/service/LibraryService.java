@@ -118,10 +118,9 @@ public class LibraryService {
         if (readerId == -1 || bookId == -1) {
             throw new IllegalArgumentException("Error: enter only digits!");
         }
-        var bookToBorrow = bookDao.findById(bookId);
-        var readerToBorrow = readerDao.findById(readerId);
-        if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
-            return borrowDao.save(bookId, readerId);
+        var borrow = borrowDao.save(bookId, readerId);
+        if (borrow.isPresent()) {
+            return borrow.get();
         } else {
             throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
         }
@@ -143,10 +142,7 @@ public class LibraryService {
         if (readerId == -1 || bookId == -1) {
             return false;
         }
-        var bookToBorrow = bookDao.findById(bookId);
-        var readerToBorrow = readerDao.findById(readerId);
-        if (bookToBorrow.isPresent() && readerToBorrow.isPresent()) {
-            borrowDao.returnBook(bookId, readerId);
+        if (borrowDao.returnBook(bookId, readerId) != 0) {
             return true;
         } else {
             throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
