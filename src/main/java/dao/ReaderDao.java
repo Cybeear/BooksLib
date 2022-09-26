@@ -1,6 +1,5 @@
 package dao;
 
-import entity.Book;
 import entity.Reader;
 
 import java.util.List;

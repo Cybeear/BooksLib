@@ -1,8 +1,8 @@
 package dao;
 
 import entity.Book;
-import service.ConnectionServicePostgresImpl;
 import service.ConnectionServiceInterface;
+import service.ConnectionServicePostgresImpl;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,6 +27,9 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public Book save(Book book) {
+        if (book == null || book.getAuthor() == null || book.getName() == null) {
+            throw new IllegalArgumentException("Failed to save book, the function is waiting book object, but receive null!");
+        }
         var sql = "INSERT INTO book(name, author) VALUES(?, ?)";
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,9 +45,6 @@ public class BookDaoPostgresqlImpl implements BookDao {
         } catch (SQLException sqlException) {
             throw new RuntimeException("Failed to save book [" + book + "]!\n" +
                     sqlException.getLocalizedMessage());
-        } catch (NullPointerException nullPointerException) {
-            throw new NullPointerException("Failed to save book, the function is waiting book object but receive null!\n" +
-                    nullPointerException.getLocalizedMessage());
         }
     }
 
@@ -124,6 +124,4 @@ public class BookDaoPostgresqlImpl implements BookDao {
                     + readerId + "\n" + sqlException.getLocalizedMessage());
         }
     }
-
-
 }

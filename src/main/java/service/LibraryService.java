@@ -6,6 +6,7 @@ import entity.Borrow;
 import entity.Reader;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -107,7 +108,7 @@ public class LibraryService {
      * and return to menu if string of arguments contains any characters other than numbers
      * add to borrowList if string not contains any characters other than numbers
      */
-    public Borrow borrowBook(String readerAndBookIds) {
+    public Optional<Borrow> borrowBook(String readerAndBookIds) {
         //Можно вынести в отдельную переменную, много дублирующегося кода.
         var inputSplit = readerAndBookIds.split(" / ");
         if (parserService.checkSize(inputSplit)) {
@@ -118,19 +119,14 @@ public class LibraryService {
         if (readerId == -1 || bookId == -1) {
             throw new IllegalArgumentException("Error: enter only digits!");
         }
-        var borrow = borrowDao.save(bookId, readerId);
-        if (borrow.isPresent()) {
-            return borrow.get();
-        } else {
-            throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
-        }
+        return borrowDao.save(bookId, readerId);
     }
 
     /**
      * @param readerAndBookIds Function call parser function, show error message
      *                         and return to menu if string of arguments contains any characters other than numbers
      *                         delete object from borrowList if string not contains any characters other than numbers
-     * @return
+     * @return true if
      */
     public boolean returnBook(String readerAndBookIds) {
         var inputSplit = readerAndBookIds.split(" / ");

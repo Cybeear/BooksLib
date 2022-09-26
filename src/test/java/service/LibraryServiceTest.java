@@ -1,7 +1,11 @@
 package service;
 
-import dao.*;
-import entity.*;
+import dao.BookDaoPostgresqlImpl;
+import dao.BorrowDaoPostgresqlImpl;
+import dao.ReaderDaoPostgresqlImpl;
+import entity.Book;
+import entity.Borrow;
+import entity.Reader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

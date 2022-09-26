@@ -101,12 +101,8 @@ public class UIService {
         System.out.println("Please enter reader id and book id to borrow separated by '/'. Like this: 4 / 2!");
         try {
             var readeAndBookIds = in.nextLine();
-            var borrow = libraryService.borrowBook(readeAndBookIds);
-            if (borrow != null) {
-                System.out.println(borrow);
-            } else {
-                System.err.println("Error: book or reader is not exists!");
-            }
+            libraryService.borrowBook(readeAndBookIds).ifPresentOrElse(System.out::println,
+                    () -> System.err.println("Error: book or reader is not exists!"));
         } catch (RuntimeException runtimeException) {
             System.err.println(runtimeException.getMessage());
         }

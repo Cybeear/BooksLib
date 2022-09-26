@@ -23,5 +23,5 @@ CREATE TABLE borrow
     CONSTRAINT FK_READER FOREIGN KEY (reader_id) REFERENCES reader (id) ON DELETE CASCADE,
     CONSTRAINT FK_BOOK FOREIGN KEY (book_id) REFERENCES book (id) ON DELETE CASCADE,
     CONSTRAINT Borrow_Unique UNIQUE (reader_id, book_id)
-        INCLUDE(reader_id, book_id)
+        INCLUDE (reader_id, book_id)
 );

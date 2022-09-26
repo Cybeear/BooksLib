@@ -8,7 +8,7 @@ public class Borrow {
     private Book book;
 
     /**
-     * @param book  Book object field
+     * @param book   Book object field
      * @param reader Reader object field
      */
     public Borrow(Book book, Reader reader) {

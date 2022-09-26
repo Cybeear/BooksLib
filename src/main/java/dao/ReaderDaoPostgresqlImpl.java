@@ -1,8 +1,8 @@
 package dao;
 
 import entity.Reader;
-import service.ConnectionServicePostgresImpl;
 import service.ConnectionServiceInterface;
+import service.ConnectionServicePostgresImpl;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,6 +27,9 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
      */
     @Override
     public Reader save(Reader reader) {
+        if (reader == null || reader.getName() == null){
+            throw new IllegalArgumentException("Failed to save reader, the function is waiting book object but receive null!");
+        }
         var sql = "INSERT INTO reader(name) VALUES(?)";
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
