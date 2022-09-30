@@ -126,7 +126,7 @@ public class UIService {
             libraryService.borrowBook(readeAndBookIds).ifPresentOrElse(System.out::println,
                     () -> System.err.println("Error: book or reader is not exists!"));
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse arguments: " + e.getMessage());
+            System.err.println("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create borrow: " + e.getMessage());
         } catch (BorrowDaoException e) {
@@ -141,7 +141,7 @@ public class UIService {
             libraryService.returnBook(readeAndBookIds);
             System.out.println("Book is returned!");
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse arguments: " + e.getMessage());
+            System.err.println("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create borrow: " + e.getMessage());
         } catch (BorrowDaoException e) {
@@ -154,8 +154,10 @@ public class UIService {
         try {
             var readerId = in.nextLine();
             libraryService.getAllBorrowedByReaderId(readerId).forEach(System.out::println);
+        } catch (ParserServiceException e) {
+            System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to get books" + e.getMessage());
+            System.err.println("Failed to get books: " + e.getMessage());
         } catch (BookDaoException e) {
             System.err.println("Failed to fetch books: " + e.getMessage());
         }
@@ -166,6 +168,8 @@ public class UIService {
         try {
             var bookId = in.nextLine();
             libraryService.getWhoBorrowByBookId(bookId).forEach(System.out::println);
+        } catch (ParserServiceException e) {
+            System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to get readers: " + e.getMessage());
         } catch (ReaderDaoException e) {

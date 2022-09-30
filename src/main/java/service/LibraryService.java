@@ -121,7 +121,7 @@ public class LibraryService {
         }
         var inputSplit = readerAndBookIds.split(" / ");
         if (inputSplit.length != 2 || inputSplit[0].isBlank() || inputSplit[1].isBlank()) {
-            throw new LibraryServiceException("You enter empty name or author!");
+            throw new LibraryServiceException("You enter empty reader id or book id!");
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
@@ -142,7 +142,7 @@ public class LibraryService {
         }
         var inputSplit = readerAndBookIds.split(" / ");
         if (inputSplit.length != 2 || inputSplit[0].isBlank() || inputSplit[1].isBlank()) {
-            throw new LibraryServiceException("You enter empty name or author!");
+            throw new LibraryServiceException("You enter empty reader id or book id!");
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
