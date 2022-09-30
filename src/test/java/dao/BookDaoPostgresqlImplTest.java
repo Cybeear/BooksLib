@@ -1,11 +1,14 @@
 package dao;
 
 import entity.Book;
+import exceptions.BookDaoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BookDaoPostgresqlImplTest {
 
     private BookDao bookDao;
@@ -18,20 +21,21 @@ class BookDaoPostgresqlImplTest {
     @Test
     void saveThenBookNotNull() {
         Book book = new Book("test", "test");
-        assertNotNull(bookDao.save(book), "DAO can not return (book == null) after successful save to DB!");
+        assertNotNull(bookDao.save(book),
+                "DAO can not return (book == null) after successful save to DB!");
     }
 
     @Test
     void saveThenBookNull() {
-        assertThrows(NullPointerException.class, () -> bookDao.save(null),
-                "DAO can not throw exception after receive null to function!");
+        assertThrows(BookDaoException.class, () -> bookDao.save(null),
+                "DAO can not throw 'BookDaoException' after receive null to function!");
     }
 
     @Test
     void saveThenJdbcConnectionNull() {
         bookDao = new BookDaoPostgresqlImpl(null);
-        assertThrows(RuntimeException.class, () -> bookDao.save(null),
-                "DAO can not throw SqlException in RuntimeException if JDBC driver is null!");
+        assertThrows(BookDaoException.class, () -> bookDao.save(null),
+                "DAO can not throw 'SqlException' in 'BookDaoException' if JDBC driver is null!");
     }
 
     @Test
@@ -50,14 +54,6 @@ class BookDaoPostgresqlImplTest {
     @Test
     void findByNotExistedId() {
         var book = bookDao.findById(1000000);
-        assertAll(() -> assertFalse(book.isPresent()),
-                () -> assertTrue(book.isEmpty()));
+        assertFalse(book.isPresent());
     }
-
-
-   /* @Test
-    void findAllByReaderId() {
-        var books = bookDao.findAllByReaderId();
-
-    }*/
 }

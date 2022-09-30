@@ -3,6 +3,7 @@ package dao;
 import entity.Book;
 import entity.Borrow;
 import entity.Reader;
+import exceptions.BorrowDaoException;
 import service.ConnectionServiceInterface;
 import service.ConnectionServicePostgresImpl;
 
@@ -30,15 +31,15 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      */
     @Override
     public Optional<Borrow> save(long bookId, long readerId) {
-        var sql = "INSERT INTO borrow(reader_id, book_id) VALUES(?, ?)";
+        var addNewBorrowSql = "INSERT INTO borrow(reader_id, book_id) VALUES(?, ?)";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
+             var statement = connection.prepareStatement(addNewBorrowSql)) {
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             statement.executeUpdate();
             return findBorrowByReaderIdAndBookId(readerId, bookId);
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to borrow a book by reader Id: "
+            throw new BorrowDaoException("by reader Id: "
                     + readerId + " and book Id: " + bookId + "!\nThis reader is borrow this book!");
         }
     }
@@ -49,7 +50,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      * @return
      */
     private Optional<Borrow> findBorrowByReaderIdAndBookId(long readerId, long bookId) {
-        var sql = """
+        var findBorrowByReaderIdAndBookIdSql = """
                 SELECT
                 b.id, b.name, b.author,
                 r.id, r.name
@@ -58,7 +59,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
                     JOIN reader r on r.id = bor.reader_id WHERE bor.reader_id = ? AND bor.book_id = ?""";
         Borrow borrow = null;
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
+             var statement = connection.prepareStatement(findBorrowByReaderIdAndBookIdSql)) {
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             var resultSet = statement.executeQuery();
@@ -73,7 +74,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             resultSet.close();
             return Optional.ofNullable(borrow);
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find borrowed data by reader Id"
+            throw new BorrowDaoException("Failed to find borrowed data by reader Id"
                     + readerId + " and book Id: " + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -83,7 +84,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      */
     @Override
     public List<Borrow> findAll() {
-        var sql = """
+        var findAllBorrowsSql = """
                 SELECT
                 b.id, b.name, b.author,
                 r.id, r.name
@@ -92,7 +93,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
                     JOIN reader r ON r.id = bor.reader_id""";
         List<Borrow> borrowList = new LinkedList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql);
+             var statement = connection.prepareStatement(findAllBorrowsSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 var book = new Book(resultSet.getInt(1),
@@ -104,7 +105,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrowList;
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find borrowed data!\n"
+            throw new BorrowDaoException("Failed to find borrowed data!\n"
                     + sqlException.getLocalizedMessage());
         }
     }
@@ -182,16 +183,16 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      */
     @Override
     public int returnBook(long bookId, long readerId) {
-        var sql = """
+        var deleteBorrowSql = """
                 DELETE FROM borrow
                 WHERE reader_id = ? AND book_id = ?""";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
+             var statement = connection.prepareStatement(deleteBorrowSql)) {
             statement.setLong(1, readerId);
             statement.setLong(2, bookId);
             return statement.executeUpdate();
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to return book with book Id:"
+            throw new BorrowDaoException("Failed to return book with book Id:"
                     + bookId + " and reader Id: " + readerId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -201,7 +202,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      */
     public List<Borrow> findAllReadersWithTheirBorrows() {
         List<Borrow> borrows = new ArrayList<>();
-        var sql = """
+        var findAllReadersAndTheirBorrowsSql = """
                 SELECT
                 r.id AS reader_id, r.name AS reader_name,
                 b.id AS book_id, b.name AS book_name, b.author AS book_author
@@ -210,7 +211,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
                     LEFT JOIN book b on b.id = bor.book_id
                 ORDER BY reader_id""";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql);
+             var statement = connection.prepareStatement(findAllReadersAndTheirBorrowsSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 Book book = null;
@@ -225,7 +226,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrows;
         } catch (SQLException sqlException) {
-            throw new RuntimeException("SqlError: " + sqlException.getLocalizedMessage());
+            throw new BorrowDaoException("SqlError: " + sqlException.getLocalizedMessage());
         }
     }
 
@@ -234,7 +235,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
      */
     public List<Borrow> findAllBooksWithTheirBorrowers() {
         List<Borrow> borrows = new ArrayList<>();
-        var sql = """
+        var findAllBooksAndTheirBorrowersSql = """
                 SELECT
                 r.id AS reader_id, r.name AS reader_name,
                 b.id AS book_id, b.name AS book_name, b.author AS book_author
@@ -243,7 +244,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
                     LEFT JOIN reader r on r.id = bor.reader_id
                 ORDER BY book_id""";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql);
+             var statement = connection.prepareStatement(findAllBooksAndTheirBorrowersSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 Book book = new Book(resultSet.getLong(3),
@@ -258,7 +259,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrows;
         } catch (SQLException sqlException) {
-            throw new RuntimeException("SqlError: " + sqlException.getLocalizedMessage());
+            throw new BorrowDaoException("SqlError: " + sqlException.getLocalizedMessage());
         }
     }
 }

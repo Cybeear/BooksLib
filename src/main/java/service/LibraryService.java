@@ -4,6 +4,8 @@ import dao.*;
 import entity.Book;
 import entity.Borrow;
 import entity.Reader;
+import exceptions.LibraryServiceException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,24 +85,26 @@ public class LibraryService {
      * Add new reader to list
      */
     public Reader registerReader(String newReaderName) {
-        if (!parserService.checkString(newReaderName)) {
-            return readerDao.save(new Reader(newReaderName));
-        } else {
-            throw new IllegalArgumentException("Failed to create new reader: reader name can not be an empty string!");
+        if (newReaderName.isBlank()) {
+            throw new LibraryServiceException("Reader name can not be an empty string!");
         }
+        return readerDao.save(new Reader(newReaderName));
     }
 
     /**
      * Add new book to list
      */
     public Book addBook(String newBookData) {
-        var inputSplit = newBookData.split(" / ");
-        if (parserService.checkSize(inputSplit) || parserService.checkString(inputSplit[0])
-                || parserService.checkString(inputSplit[1])) {
-            throw new IllegalArgumentException("Failed to create new book: your input is incorrect or an empty string!");
-        } else {
-            return bookDao.save(new Book(inputSplit[0], inputSplit[1]));
+        if (StringUtils.countMatches(newBookData, "/") != 1
+                || StringUtils.isBlank(newBookData)
+                || StringUtils.equals(" / ", newBookData)) {
+            throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
+        var inputSplit = newBookData.split(" / ");
+        if (inputSplit.length != 2 ||inputSplit[0].isBlank() || inputSplit[1].isBlank()) {
+            throw new LibraryServiceException("You enter empty name or author!");
+        }
+        return bookDao.save(new Book(inputSplit[0], inputSplit[1]));
     }
 
     /**
@@ -110,15 +114,17 @@ public class LibraryService {
      */
     public Optional<Borrow> borrowBook(String readerAndBookIds) {
         //Можно вынести в отдельную переменную, много дублирующегося кода.
+        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
+                || StringUtils.isBlank(readerAndBookIds)
+                || StringUtils.equals(" / ", readerAndBookIds)) {
+            throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
+        }
         var inputSplit = readerAndBookIds.split(" / ");
-        if (parserService.checkSize(inputSplit)) {
-            throw new IllegalArgumentException("Error: enter a valid data of two arguments. Like this: 4 / 2!");
+        if (inputSplit.length != 2 || inputSplit[0].isBlank() || inputSplit[1].isBlank()) {
+            throw new LibraryServiceException("You enter empty name or author!");
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
-        if (readerId == -1 || bookId == -1) {
-            throw new IllegalArgumentException("Error: enter only digits!");
-        }
         return borrowDao.save(bookId, readerId);
     }
 
@@ -128,20 +134,20 @@ public class LibraryService {
      *                         delete object from borrowList if string not contains any characters other than numbers
      * @return true if
      */
-    public boolean returnBook(String readerAndBookIds) {
+    public void returnBook(String readerAndBookIds) {
+        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
+                || StringUtils.isBlank(readerAndBookIds)
+                || StringUtils.equals(" / ", readerAndBookIds)) {
+            throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
+        }
         var inputSplit = readerAndBookIds.split(" / ");
-        if (parserService.checkSize(inputSplit)) {
-            throw new IllegalArgumentException("Error: enter a valid data. Like this: 1 / 3!");
+        if (inputSplit.length != 2 || inputSplit[0].isBlank() || inputSplit[1].isBlank()) {
+            throw new LibraryServiceException("You enter empty name or author!");
         }
         var readerId = parserService.parseLong(inputSplit[0]);
         var bookId = parserService.parseLong(inputSplit[1]);
-        if (readerId == -1 || bookId == -1) {
-            return false;
-        }
-        if (borrowDao.returnBook(bookId, readerId) != 0) {
-            return true;
-        } else {
-            throw new IllegalArgumentException("Error: Book or a Reader is not exists!");
+        if (borrowDao.returnBook(bookId, readerId) == 0) {
+            throw new LibraryServiceException("Book or a Reader is not exists!");
         }
     }
 
@@ -152,15 +158,11 @@ public class LibraryService {
      */
     public List<Book> getAllBorrowedByReaderId(String readerId) {
         var parsed = parserService.parseLong(readerId);
-        if (parsed == -1) {
-            throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
-        }
         var books = bookDao.findAllByReaderId(parsed);
-        if (!books.isEmpty()) {
-            return books;
-        } else {
-            throw new IllegalArgumentException("Error, this reader is not exist!");
+        if (books.isEmpty()) {
+            throw new LibraryServiceException("This reader don`t borrow books!");
         }
+        return books;
     }
 
     /**
@@ -169,16 +171,15 @@ public class LibraryService {
      * print who borrow book by book id
      */
     public List<Reader> getWhoBorrowByBookId(String bookId) {
+        if (bookId.isBlank()) {
+            throw new LibraryServiceException("You enter a empty string!");
+        }
         var parsed = parserService.parseLong(bookId);
-        if (parsed == -1) {
-            throw new IllegalArgumentException("Error: enter a valid data. Enter only digits!");
-        }
         var readers = readerDao.findAllByBookId(parsed);
-        if (!readers.isEmpty()) {
-            return readers;
-        } else {
-            throw new IllegalArgumentException("Error, this book is not exist!");
+        if (readers.isEmpty()) {
+            throw new LibraryServiceException("This book is not exist!");
         }
+        return readers;
     }
 
     /**

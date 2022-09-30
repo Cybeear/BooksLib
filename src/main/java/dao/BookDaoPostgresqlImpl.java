@@ -1,6 +1,7 @@
 package dao;
 
 import entity.Book;
+import exceptions.BookDaoException;
 import service.ConnectionServiceInterface;
 import service.ConnectionServicePostgresImpl;
 
@@ -27,12 +28,9 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public Book save(Book book) {
-        if (book == null || book.getAuthor() == null || book.getName() == null) {
-            throw new IllegalArgumentException("Failed to save book, the function is waiting book object, but receive null!");
-        }
-        var sql = "INSERT INTO book(name, author) VALUES(?, ?)";
+        var addNewBookSql = "INSERT INTO book(name, author) VALUES(?, ?)";
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             var statement = connection.prepareStatement(addNewBookSql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, book.getName());
             statement.setString(2, book.getAuthor());
             statement.executeUpdate();
@@ -42,9 +40,10 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             resultSet.close();
             return book;
+        } catch (NullPointerException nullPointerException) {
+            throw new BookDaoException("Function waiting book object, but receive null!");
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to save book [" + book + "]!\n" +
-                    sqlException.getLocalizedMessage());
+            throw new BookDaoException("[" + book + "]!");
         }
     }
 
@@ -53,10 +52,10 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public List<Book> findAll() {
-        var sql = "SELECT * FROM book";
+        var findAllBooksSql = "SELECT * FROM book";
         List<Book> bookList = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql);
+             var statement = connection.prepareStatement(findAllBooksSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 bookList.add(new Book(resultSet.getInt(1),
@@ -65,7 +64,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             return bookList;
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find books!\n" + sqlException.getLocalizedMessage());
+            throw new BookDaoException("Failed to find books!\n" + sqlException.getLocalizedMessage());
         }
     }
 
@@ -75,10 +74,10 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public Optional<Book> findById(long bookId) {
-        var sql = "SELECT * FROM book WHERE id = ?";
+        var findBookByIdSql = "SELECT * FROM book WHERE id = ?";
         Book book = null;
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
+             var statement = connection.prepareStatement(findBookByIdSql)) {
             statement.setLong(1, bookId);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -88,7 +87,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             return Optional.ofNullable(book);
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find book by Id: "
+            throw new BookDaoException("Failed to find book by Id: "
                     + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -99,7 +98,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
      */
     @Override
     public List<Book> findAllByReaderId(long readerId) {
-        var sql = """
+        var findAllBooksByReaderIdSql = """
                 SELECT
                 b.id,
                 b.name,
@@ -109,7 +108,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
                 WHERE bor.reader_id = ?""";
         List<Book> books = new ArrayList<>();
         try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
+             var statement = connection.prepareStatement(findAllBooksByReaderIdSql)) {
             statement.setLong(1, readerId);
             var resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -120,7 +119,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             resultSet.close();
             return books;
         } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find books by reader Id: "
+            throw new BookDaoException("Failed to find books by reader Id: "
                     + readerId + "\n" + sqlException.getLocalizedMessage());
         }
     }

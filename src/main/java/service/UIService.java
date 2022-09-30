@@ -1,5 +1,7 @@
 package service;
 
+import exceptions.*;
+
 import java.util.Scanner;
 
 public class UIService {
@@ -66,11 +68,29 @@ public class UIService {
     }
 
     private void showAllBooks() {
-        libraryService.getAllBooks().forEach(System.out::println);
+        try {
+            var books = libraryService.getAllBooks();
+            if (!books.isEmpty()) {
+                books.forEach(System.out::println);
+            } else {
+                System.out.println("Database have not any books!");
+            }
+        } catch (BookDaoException e) {
+            System.err.println("Database error: " + e);
+        }
     }
 
     private void showAllReaders() {
-        libraryService.getAllReaders().forEach(System.out::println);
+        try {
+            var readers = libraryService.getAllReaders();
+            if (!readers.isEmpty()) {
+                readers.forEach(System.out::println);
+            } else {
+                System.out.println("Database have not any readers!");
+            }
+        } catch (ReaderDaoException e) {
+            System.err.println("Database error: " + e);
+        }
     }
 
     private void registerReader() {
@@ -79,8 +99,10 @@ public class UIService {
             var newReaderName = in.nextLine();
             var reader = libraryService.registerReader(newReaderName);
             System.out.println(reader + " successful registered!");
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println(illegalArgumentException.getMessage());
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to create new reader: " + e.getMessage());
+        } catch (ReaderDaoException e) {
+            System.err.println("Failed to save reader: " + e.getMessage());
         }
     }
 
@@ -90,10 +112,10 @@ public class UIService {
             var newBookData = in.nextLine();
             var book = libraryService.addBook(newBookData);
             System.out.println(book + " successful added!");
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println("Error: Please enter new book name and author separated by '/'. Like this: name / author!");
-        } catch (NullPointerException nullPointerException) {
-            System.err.println("Error: " + nullPointerException.getMessage());
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to create new book: " + e.getMessage());
+        } catch (BookDaoException e) {
+            System.err.println("Failed to save book: " + e.getMessage());
         }
     }
 
@@ -103,8 +125,12 @@ public class UIService {
             var readeAndBookIds = in.nextLine();
             libraryService.borrowBook(readeAndBookIds).ifPresentOrElse(System.out::println,
                     () -> System.err.println("Error: book or reader is not exists!"));
-        } catch (RuntimeException runtimeException) {
-            System.err.println(runtimeException.getMessage());
+        } catch (ParserServiceException e) {
+            System.err.println("Failed to parse arguments: " + e.getMessage());
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to create borrow: " + e.getMessage());
+        } catch (BorrowDaoException e) {
+            System.err.println("Failed to borrow a book: " + e.getMessage());
         }
     }
 
@@ -112,14 +138,14 @@ public class UIService {
         System.out.println("Please enter reader id and book id to return separated by '/'. Like this: 1 / 3!");
         try {
             var readeAndBookIds = in.nextLine();
-            var returned = libraryService.returnBook(readeAndBookIds);
-            if (!returned) {
-                System.err.println("Data is not exists!");
-            } else {
-                System.out.println("Book is returned!");
-            }
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println(illegalArgumentException.getMessage());
+            libraryService.returnBook(readeAndBookIds);
+            System.out.println("Book is returned!");
+        } catch (ParserServiceException e) {
+            System.err.println("Failed to parse arguments: " + e.getMessage());
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to create borrow: " + e.getMessage());
+        } catch (BorrowDaoException e) {
+            System.err.println("Failed to return book: " + e.getMessage());
         }
     }
 
@@ -127,14 +153,11 @@ public class UIService {
         System.out.println("Please enter reader id: ");
         try {
             var readerId = in.nextLine();
-            var readers = libraryService.getAllBorrowedByReaderId(readerId);
-            if (!readers.isEmpty()) {
-                readers.forEach(System.out::println);
-            } else {
-                System.err.println("Error, this reader is not exist or does not borrow any book!");
-            }
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println(illegalArgumentException.getMessage());
+            libraryService.getAllBorrowedByReaderId(readerId).forEach(System.out::println);
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to get books" + e.getMessage());
+        } catch (BookDaoException e) {
+            System.err.println("Failed to fetch books: " + e.getMessage());
         }
     }
 
@@ -142,32 +165,37 @@ public class UIService {
         System.out.println("Please enter book id: ");
         try {
             var bookId = in.nextLine();
-            var readers = libraryService.getWhoBorrowByBookId(bookId);
-            if (!readers.isEmpty()) {
-                readers.forEach(System.out::println);
-            } else {
-                System.err.println("Error: this book isn`t borrowed!");
-            }
-        } catch (IllegalArgumentException illegalArgumentException) {
-            System.err.println(illegalArgumentException.getMessage());
+            libraryService.getWhoBorrowByBookId(bookId).forEach(System.out::println);
+        } catch (LibraryServiceException e) {
+            System.err.println("Failed to get readers: " + e.getMessage());
+        } catch (ReaderDaoException e) {
+            System.err.println("Failed to fetch readers: " + e.getMessage());
         }
     }
 
     private void showAllReadersWithTheirBorrows() {
-        var borrows = libraryService.getAllReadersWithTheirBorrows();
-        if (!borrows.isEmpty()) {
-            borrows.forEach(System.out::println);
-        } else {
-            System.err.println("No active readers at the moment!");
+        try {
+            var borrows = libraryService.getAllReadersWithTheirBorrows();
+            if (!borrows.isEmpty()) {
+                borrows.forEach(System.out::println);
+            } else {
+                System.out.println("No active readers at the moment!");
+            }
+        } catch (BorrowDaoException e) {
+            System.err.println("Database error: " + e.getMessage());
         }
     }
 
     private void showAllBooksWithTheirBorrowers() {
         var borrows = libraryService.getAllBooksWithTheirBorrowers();
-        if (!borrows.isEmpty()) {
-            borrows.forEach(System.out::println);
-        } else {
-            System.err.println("At the moment no books are borrowed!");
+        try {
+            if (!borrows.isEmpty()) {
+                borrows.forEach(System.out::println);
+            } else {
+                System.err.println("At the moment no books are borrowed!");
+            }
+        } catch (BorrowDaoException e) {
+            System.err.println("Database error: " + e.getMessage());
         }
     }
 }

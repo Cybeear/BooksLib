@@ -1,5 +1,7 @@
 package service;
 
+import exceptions.JdbcConnectionException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -50,9 +52,7 @@ public class ConnectionServicePostgresImpl implements ConnectionServiceInterface
         try {
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (SQLException sqlException) {
-            System.err.println("Error with JDBC create connection" + sqlException.getMessage());
-            System.exit(1);
+            throw new JdbcConnectionException("Error with JDBC create connection " + sqlException.getMessage());
         }
-        return null;
     }
 }
