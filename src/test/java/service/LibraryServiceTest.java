@@ -106,7 +106,8 @@ class LibraryServiceTest {
     @DisplayName("Test adding new book with incorrect data")
     @Test
     void addBookWithInCorrectInput() {
-        var expectedErrorMessage = "You enter empty name or author!";
+        var expectedErrorMessageIfEmptyBookName = "Book name can not be an empty string!";
+        var expectedErrorMessageIfEmptyBookAuthor = "Book author can not be an empty string!";
         var exceptionOfEmptyBookName = assertThrows(
                 LibraryServiceException.class,
                 () -> libraryService.addBook("  / author"));
@@ -114,8 +115,12 @@ class LibraryServiceTest {
                 LibraryServiceException.class,
                 () -> libraryService.addBook("name /  "));
         assertAll(
-                () -> assertEquals(exceptionOfEmptyBookName.getMessage(), expectedErrorMessage),
-                () -> assertEquals(exceptionOfEmptyBookAuthor.getMessage(), expectedErrorMessage),
+                () -> assertEquals(
+                        expectedErrorMessageIfEmptyBookName,
+                        exceptionOfEmptyBookName.getMessage()),
+                () -> assertEquals(
+                        expectedErrorMessageIfEmptyBookAuthor,
+                        exceptionOfEmptyBookAuthor.getMessage()),
                 () -> verify(bookDao, never())
                         .save(any())
         );
