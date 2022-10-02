@@ -28,9 +28,6 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
      */
     @Override
     public Reader save(Reader reader) {
-        if (reader == null || reader.getName() == null) {
-            throw new IllegalArgumentException("The function is waiting book object but receive null!");
-        }
         var addNewBookSql = "INSERT INTO reader(name) VALUES(?)";
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(addNewBookSql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,9 +39,6 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             }
             resultSet.close();
             return reader;
-        } catch (NullPointerException nullPointerException) {
-            throw new ReaderDaoException("Function waiting reader object, but receive null "
-                    + nullPointerException.getLocalizedMessage());
         } catch (SQLException sqlException) {
             throw new ReaderDaoException("[" + reader + "]!\n" +
                     sqlException.getLocalizedMessage());

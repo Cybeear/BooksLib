@@ -153,7 +153,12 @@ public class UIService {
         System.out.println("Please enter reader id: ");
         try {
             var readerId = in.nextLine();
-            libraryService.getAllBorrowedByReaderId(readerId).forEach(System.out::println);
+            var books = libraryService.getAllBorrowedByReaderId(readerId);
+            if (!books.isEmpty()) {
+                books.forEach(System.out::println);
+            } else {
+                System.out.println("This reader isn`t borrow books!");
+            }
         } catch (ParserServiceException e) {
             System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
@@ -167,7 +172,12 @@ public class UIService {
         System.out.println("Please enter book id: ");
         try {
             var bookId = in.nextLine();
-            libraryService.getWhoBorrowByBookId(bookId).forEach(System.out::println);
+            var readers = libraryService.getWhoBorrowByBookId(bookId);
+            if (!readers.isEmpty()) {
+                readers.forEach(System.out::println);
+            } else {
+                System.out.println("This book isn`t borrowed!");
+            }
         } catch (ParserServiceException e) {
             System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {

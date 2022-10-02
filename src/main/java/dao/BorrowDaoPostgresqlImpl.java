@@ -40,7 +40,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             return findBorrowByReaderIdAndBookId(readerId, bookId);
         } catch (SQLException sqlException) {
             throw new BorrowDaoException("by reader Id: "
-                    + readerId + " and book Id: " + bookId + "!\nThis reader is borrow this book!");
+                    + readerId + " and book Id: " + bookId + "!\nThis reader is borrow this book!" + sqlException.getLocalizedMessage());
         }
     }
 

@@ -40,10 +40,9 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             resultSet.close();
             return book;
-        } catch (NullPointerException nullPointerException) {
-            throw new BookDaoException("Function waiting book object, but receive null!");
         } catch (SQLException sqlException) {
-            throw new BookDaoException("[" + book + "]!");
+            throw new BookDaoException("[" + book + "]!\n"
+                    + sqlException.getLocalizedMessage());
         }
     }
 

@@ -152,9 +152,7 @@ public class LibraryService {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = readerAndBookIds.split(" / ");
-        if (inputSplit.length != 2) {
-            throw new LibraryServiceException("You enter empty string!");
-        } else if (inputSplit[0].isBlank()) {
+        if (inputSplit[0].isBlank()) {
             throw new LibraryServiceException("Reader id can not be an empty string!!");
         } else if (inputSplit[1].isBlank()) {
             throw new LibraryServiceException("Book id can not be an empty string!!");
@@ -167,17 +165,16 @@ public class LibraryService {
     }
 
     /**
-     * @param readerId Return to menu if string of arguments contains any symbols other than numbers or
-     *                 print all borrow objects by reader id
-     * @return
+     * @param readerId
+     * @return Return to menu if string of arguments contains any symbols other than numbers or
+     * print all borrow objects by reader id
      */
     public List<Book> getAllBorrowedByReaderId(String readerId) {
-        var parsed = parserService.parseLong(readerId);
-        var books = bookDao.findAllByReaderId(parsed);
-        if (books.isEmpty()) {
-            throw new LibraryServiceException("This reader isn`t borrow books!");
+        if (readerId.isBlank()) {
+            throw new LibraryServiceException("You enter an empty string!");
         }
-        return books;
+        var parsed = parserService.parseLong(readerId);
+        return bookDao.findAllByReaderId(parsed);
     }
 
     /**
@@ -187,14 +184,10 @@ public class LibraryService {
      */
     public List<Reader> getWhoBorrowByBookId(String bookId) {
         if (bookId.isBlank()) {
-            throw new LibraryServiceException("You enter a empty string!");
+            throw new LibraryServiceException("You enter an empty string!");
         }
         var parsed = parserService.parseLong(bookId);
-        var readers = readerDao.findAllByBookId(parsed);
-        if (readers.isEmpty()) {
-            throw new LibraryServiceException("This book isn`t borrowed!");
-        }
-        return readers;
+        return readerDao.findAllByBookId(parsed);
     }
 
     /**
