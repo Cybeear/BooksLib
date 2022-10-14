@@ -5,28 +5,19 @@ import exceptions.*;
 import java.util.Scanner;
 
 public class UIService {
-    private LibraryService libraryService;
-    private Scanner in;
+    private final LibraryService libraryService;
+    private final Scanner in = new Scanner(System.in);
 
     public LibraryService getLibraryService() {
         return libraryService;
-    }
-
-    public void setLibraryService(LibraryService libraryService) {
-        this.libraryService = libraryService;
     }
 
     public Scanner getIn() {
         return in;
     }
 
-    public void setIn(Scanner in) {
-        this.in = in;
-    }
-
     public UIService() {
         libraryService = new LibraryService();
-        in = new Scanner(System.in);
     }
 
     public void drawMenu() {

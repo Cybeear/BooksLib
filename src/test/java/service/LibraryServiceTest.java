@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -82,23 +83,34 @@ class LibraryServiceTest {
     @DisplayName("Test adding new book with incorrect data")
     @Test
     void addBookWithInCorrectInputString() {
-        var expectedErrorMessage = "Your input is incorrect, you need to write name and author separated by '/'!";
+        var expectedErrorMessageWhenDoesNotHaveSeparator = "Your input is incorrect, you need to write name and author separated by '/'!";
         var exceptionOfIllegalArguments = assertThrows(
                 LibraryServiceException.class,
                 () -> libraryService.addBook("name"));
         var exceptionOfEmptyString = assertThrows(
                 LibraryServiceException.class,
                 () -> libraryService.addBook("       "));
-        var exceptionOfEmptyString2 = assertThrows(
+        var expectedErrorMessageWhenStringDoesNotHaveAuthor = "Book author can not be an empty string!";
+        var exceptionIfAuthorIsBlank = assertThrows(
                 LibraryServiceException.class,
-                () -> libraryService.addBook(" / "));
+                () -> libraryService.addBook("name /  "));
+        var expectedErrorMessageWhenStringDoesNotHaveName = "Book name can not be an empty string!";
+        var exceptionIfNameIsBlank = assertThrows(
+                LibraryServiceException.class,
+                () -> libraryService.addBook(" / author"));
         assertAll(
                 () -> assertEquals(
-                        exceptionOfIllegalArguments.getMessage(), expectedErrorMessage),
+                        exceptionOfIllegalArguments.getMessage(),
+                        expectedErrorMessageWhenDoesNotHaveSeparator),
                 () -> assertEquals(
-                        exceptionOfEmptyString.getMessage(), expectedErrorMessage),
+                        exceptionOfEmptyString.getMessage(),
+                        expectedErrorMessageWhenDoesNotHaveSeparator),
                 () -> assertEquals(
-                        exceptionOfEmptyString2.getMessage(), expectedErrorMessage),
+                        exceptionIfAuthorIsBlank.getMessage(),
+                        expectedErrorMessageWhenStringDoesNotHaveAuthor),
+                () -> assertEquals(
+                        exceptionIfNameIsBlank.getMessage(),
+                        expectedErrorMessageWhenStringDoesNotHaveName),
                 () -> verify(bookDao, never())
                         .save(any()));
     }
@@ -160,8 +172,10 @@ class LibraryServiceTest {
     void returnBookWithCorrectData() {
         Mockito.doReturn(1).when(borrowDao).returnBook(anyLong(), anyLong());
         libraryService.returnBook("1 / 1");
+        libraryService.returnBook("9999/ 9789");
+        libraryService.returnBook("9999 /  9789");
         assertAll(
-                () -> verify(borrowDao, times(1))
+                () -> verify(borrowDao, times(3))
                         .returnBook(anyLong(), anyLong()));
     }
 
@@ -171,8 +185,6 @@ class LibraryServiceTest {
         assertAll(
                 () -> assertThrows(LibraryServiceException.class,
                         () -> libraryService.returnBook("5")),
-                () -> assertThrows(LibraryServiceException.class,
-                        () -> libraryService.returnBook("9999/ 9789")),
                 () -> verify(borrowDao, never())
                         .returnBook(anyLong(), anyLong()));
     }
@@ -198,7 +210,7 @@ class LibraryServiceTest {
     void getAllBorrowedByNotExistedReaderId() {
         Mockito.doReturn(new ArrayList<Book>()).when(bookDao).findAllByReaderId(anyLong());
         assertAll(
-                () -> assertThrows(LibraryServiceException.class, () -> libraryService.getAllBorrowedByReaderId("999")),
+                () -> assertDoesNotThrow(() -> libraryService.getAllBorrowedByReaderId("999")),
                 () -> assertThrows(ParserServiceException.class, () -> libraryService.getAllBorrowedByReaderId("test")),
                 () -> verify(bookDao, times(1)).findAllByReaderId(anyLong()));
     }
@@ -224,8 +236,7 @@ class LibraryServiceTest {
     void getWhoBorrowByNotExistedBookId() {
         Mockito.doReturn(new ArrayList<Reader>()).when(readerDao).findAllByBookId(anyLong());
         assertAll(
-                () -> assertThrows(LibraryServiceException.class,
-                        () -> libraryService.getWhoBorrowByBookId("999")),
+                () -> assertDoesNotThrow(() -> libraryService.getWhoBorrowByBookId("999")),
                 () -> assertThrows(ParserServiceException.class,
                         () -> libraryService.getWhoBorrowByBookId("test")),
                 () -> verify(readerDao, times(1))

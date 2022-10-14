@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,15 +28,9 @@ class BookDaoPostgresqlImplTest {
     }
 
     @Test
-    void saveThenBookNull() {
-        assertThrows(BookDaoException.class, () -> bookDao.save(null),
-                "DAO can not throw 'BookDaoException' after receive null to function!");
-    }
-
-    @Test
     void saveThenJdbcConnectionNull() {
         bookDao = new BookDaoPostgresqlImpl(null);
-        assertThrows(BookDaoException.class, () -> bookDao.save(null),
+        assertThrows(NullPointerException.class, () -> bookDao.save(null),
                 "DAO can not throw 'SqlException' in 'BookDaoException' if JDBC driver is null!");
     }
 

@@ -88,28 +88,29 @@ public class LibraryService {
         if (newReaderName.isBlank()) {
             throw new LibraryServiceException("Reader name can not be an empty string!");
         }
-        return readerDao.save(new Reader(newReaderName));
+        return readerDao.save(
+                new Reader(newReaderName));
     }
 
     /**
      * Add new book to list
      */
     public Book addBook(String newBookData) {
-        if (
-                StringUtils.countMatches(newBookData, "/") != 1
-                        || StringUtils.equals(" / ", newBookData)
-                        || StringUtils.isBlank(newBookData)) {
+        if (StringUtils.countMatches(newBookData, "/") != 1
+                || StringUtils.equals("/", newBookData)
+                || StringUtils.isBlank(newBookData)) {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
-        var inputSplit = newBookData.split(" / ");
-        if (inputSplit.length != 2) {
-            throw new LibraryServiceException("You enter empty string!");
-        } else if (inputSplit[0].isBlank()) {
+        var inputSplit = newBookData.split("/");
+        if (inputSplit[0].isBlank()) {
             throw new LibraryServiceException("Book name can not be an empty string!");
         } else if (inputSplit[1].isBlank()) {
             throw new LibraryServiceException("Book author can not be an empty string!");
         }
-        return bookDao.save(new Book(inputSplit[0], inputSplit[1]));
+        return bookDao.save(
+                new Book(
+                        inputSplit[0].trim(),
+                        inputSplit[1].trim()));
     }
 
     /**
@@ -118,23 +119,19 @@ public class LibraryService {
      * add to borrowList if string not contains any characters other than numbers
      */
     public Optional<Borrow> borrowBook(String readerAndBookIds) {
-        //Можно вынести в отдельную функцию, много дублирующегося кода.
-        if (
-                StringUtils.countMatches(readerAndBookIds, "/") != 1
-                        || StringUtils.equals(" / ", readerAndBookIds)
-                        || StringUtils.isBlank(readerAndBookIds)) {
+        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
+                || StringUtils.equals("/", readerAndBookIds)
+                || StringUtils.isBlank(readerAndBookIds)) {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
-        var inputSplit = readerAndBookIds.split(" / ");
-        if (inputSplit.length != 2) {
-            throw new LibraryServiceException("You enter empty string!");
-        } else if (inputSplit[0].isBlank()) {
+        var inputSplit = readerAndBookIds.split("/");
+        if (inputSplit[0].isBlank()) {
             throw new LibraryServiceException("Reader id can not be an empty string!");
         } else if (inputSplit[1].isBlank()) {
             throw new LibraryServiceException("Book id can not be an empty string!!");
         }
-        var readerId = parserService.parseLong(inputSplit[0]);
-        var bookId = parserService.parseLong(inputSplit[1]);
+        var readerId = parserService.parseLong(inputSplit[0].trim());
+        var bookId = parserService.parseLong(inputSplit[1].trim());
         return borrowDao.save(bookId, readerId);
     }
 
@@ -145,20 +142,19 @@ public class LibraryService {
      * @return true if
      */
     public void returnBook(String readerAndBookIds) {
-        if (
-                StringUtils.countMatches(readerAndBookIds, "/") != 1
-                        || StringUtils.equals(" / ", readerAndBookIds)
-                        || StringUtils.isBlank(readerAndBookIds)) {
+        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
+                || StringUtils.equals("/", readerAndBookIds)
+                || StringUtils.isBlank(readerAndBookIds)) {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
-        var inputSplit = readerAndBookIds.split(" / ");
+        var inputSplit = readerAndBookIds.split("/");
         if (inputSplit[0].isBlank()) {
             throw new LibraryServiceException("Reader id can not be an empty string!!");
         } else if (inputSplit[1].isBlank()) {
             throw new LibraryServiceException("Book id can not be an empty string!!");
         }
-        var readerId = parserService.parseLong(inputSplit[0]);
-        var bookId = parserService.parseLong(inputSplit[1]);
+        var readerId = parserService.parseLong(inputSplit[0].trim());
+        var bookId = parserService.parseLong(inputSplit[1].trim());
         if (borrowDao.returnBook(bookId, readerId) == 0) {
             throw new LibraryServiceException("Book or a Reader is not exists!");
         }
@@ -173,7 +169,7 @@ public class LibraryService {
         if (readerId.isBlank()) {
             throw new LibraryServiceException("You enter an empty string!");
         }
-        var parsed = parserService.parseLong(readerId);
+        var parsed = parserService.parseLong(readerId.trim());
         return bookDao.findAllByReaderId(parsed);
     }
 
@@ -186,7 +182,7 @@ public class LibraryService {
         if (bookId.isBlank()) {
             throw new LibraryServiceException("You enter an empty string!");
         }
-        var parsed = parserService.parseLong(bookId);
+        var parsed = parserService.parseLong(bookId.trim());
         return readerDao.findAllByBookId(parsed);
     }
 

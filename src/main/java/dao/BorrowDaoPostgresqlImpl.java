@@ -4,8 +4,7 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 import exceptions.BorrowDaoException;
-import service.ConnectionServiceInterface;
-import service.ConnectionServicePostgresImpl;
+import service.ConnectionService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class BorrowDaoPostgresqlImpl implements BorrowDao {
-    private ConnectionServiceInterface connectionService;
+    private final ConnectionService connectionService;
 
     public BorrowDaoPostgresqlImpl() {
-        connectionService = new ConnectionServicePostgresImpl();
+        connectionService = new ConnectionService();
     }
 
-    public BorrowDaoPostgresqlImpl(ConnectionServiceInterface connectionService) {
+    public BorrowDaoPostgresqlImpl(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 

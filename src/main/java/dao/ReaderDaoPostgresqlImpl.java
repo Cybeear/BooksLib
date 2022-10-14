@@ -2,8 +2,7 @@ package dao;
 
 import entity.Reader;
 import exceptions.ReaderDaoException;
-import service.ConnectionServiceInterface;
-import service.ConnectionServicePostgresImpl;
+import service.ConnectionService;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,13 +11,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class ReaderDaoPostgresqlImpl implements ReaderDao {
-    private ConnectionServiceInterface connectionService;
+    private final ConnectionService connectionService;
 
     public ReaderDaoPostgresqlImpl() {
-        connectionService = new ConnectionServicePostgresImpl();
+        connectionService = new ConnectionService();
     }
 
-    public ReaderDaoPostgresqlImpl(ConnectionServiceInterface connectionService) {
+    public ReaderDaoPostgresqlImpl(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 

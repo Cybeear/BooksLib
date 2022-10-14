@@ -6,18 +6,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionServicePostgresImpl implements ConnectionServiceInterface {
+public class ConnectionService {
     private String DB_URL;
     private String DB_USER;
     private String DB_PASS;
 
-    public ConnectionServicePostgresImpl() {
+    public ConnectionService() {
         DB_URL = "jdbc:postgresql://localhost:49153/bookslib";
         DB_USER = "postgres";
         DB_PASS = "postgrespw";
     }
 
-    public ConnectionServicePostgresImpl(String dbUrl, String dbUser, String dbPass) {
+    public ConnectionService(String dbUrl, String dbUser, String dbPass) {
         DB_URL = dbUrl;
         DB_USER = dbUser;
         DB_PASS = dbPass;
@@ -47,7 +47,6 @@ public class ConnectionServicePostgresImpl implements ConnectionServiceInterface
         DB_PASS = dbPass;
     }
 
-    @Override
     public Connection createConnection() {
         try {
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
