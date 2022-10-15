@@ -156,9 +156,6 @@ public class LibraryService {
      * print all borrow objects by reader id
      */
     public List<Book> getAllBorrowedByReaderId(String readerId) {
-        if (readerId.isBlank()) {
-            throw new LibraryServiceException("You enter an empty string!");
-        }
         var parsed = parserService.parseLong(readerId.trim());
         return bookDao.findAllByReaderId(parsed);
     }
@@ -169,9 +166,6 @@ public class LibraryService {
      * print who borrow book by book id
      */
     public List<Reader> getWhoBorrowByBookId(String bookId) {
-        if (bookId.isBlank()) {
-            throw new LibraryServiceException("You enter an empty string!");
-        }
         var parsed = parserService.parseLong(bookId.trim());
         return readerDao.findAllByBookId(parsed);
     }
