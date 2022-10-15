@@ -125,11 +125,6 @@ public class LibraryService {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = readerAndBookIds.split("/");
-        if (inputSplit[0].isBlank()) {
-            throw new LibraryServiceException("Reader id can not be an empty string!");
-        } else if (inputSplit[1].isBlank()) {
-            throw new LibraryServiceException("Book id can not be an empty string!!");
-        }
         var readerId = parserService.parseLong(inputSplit[0].trim());
         var bookId = parserService.parseLong(inputSplit[1].trim());
         return borrowDao.save(bookId, readerId);
@@ -148,11 +143,6 @@ public class LibraryService {
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = readerAndBookIds.split("/");
-        if (inputSplit[0].isBlank()) {
-            throw new LibraryServiceException("Reader id can not be an empty string!!");
-        } else if (inputSplit[1].isBlank()) {
-            throw new LibraryServiceException("Book id can not be an empty string!!");
-        }
         var readerId = parserService.parseLong(inputSplit[0].trim());
         var bookId = parserService.parseLong(inputSplit[1].trim());
         if (borrowDao.returnBook(bookId, readerId) == 0) {
