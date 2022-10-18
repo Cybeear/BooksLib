@@ -1,19 +1,18 @@
-package core;
+package entity;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Book {
     private static AtomicLong counter = new AtomicLong(1000L);
-
-    private final long id;
+    //UUID
+    private long id;
 
     private String name;
 
     private String author;
 
     /**
-     *
      * @param name
      * @param author
      */
@@ -23,11 +22,21 @@ public class Book {
         this.author = author;
     }
 
+    public Book(long id, String name, String author) {
+        this.id = id;
+        this.name = name;
+        this.author = author;
+    }
+
     /**
      * @return book id
      */
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     /**
@@ -67,6 +76,6 @@ public class Book {
 
     @Override
     public String toString() {
-        return "id: " + id + "\tname: " + name + "\tauthor: " + author + ".";
+        return "book - id: " + id + "\tname: " + name + "\tauthor: " + author;
     }
 }

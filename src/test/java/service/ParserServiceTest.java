@@ -1,0 +1,28 @@
+package service;
+
+import exceptions.ParserServiceException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class ParserServiceTest {
+
+    ParserService parserService = new ParserService();
+
+    @Test
+    void parseIntWithInValidDataInString() {
+        assertThrows(ParserServiceException.class, () -> parserService.parseLong("test string"));
+    }
+
+    @Test
+    void parseIntWithValidDataInString() {
+        assertAll(() -> assertEquals(5, parserService.parseLong("5")),
+                () -> assertDoesNotThrow(() -> parserService.parseLong("5")));
+
+    }
+
+    @Test
+    void parseIntWithFloatNumberInString() {
+        assertThrows(ParserServiceException.class, () -> parserService.parseLong("423.42"));
+    }
+}
