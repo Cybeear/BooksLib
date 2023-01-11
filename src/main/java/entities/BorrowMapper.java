@@ -17,12 +17,22 @@ public class BorrowMapper implements RowMapper<Borrow> {
     public Borrow mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         Borrow borrow = new Borrow();
         Book book = new Book();
-        book.setId(resultSet.getLong("book.id"));
-        book.setName(resultSet.getString("book.name"));
-        book.setAuthor(resultSet.getString("book.author"));
         Reader reader = new Reader();
-        reader.setId(resultSet.getLong("reader.id"));
-        reader.setName(resultSet.getString("reader.name"));
+
+        try{
+            book.setId(resultSet.getLong("b.id"));
+            book.setName(resultSet.getString("b.name"));
+            book.setAuthor(resultSet.getString("b.author"));
+        } catch (SQLException sqlException){
+            book = null;
+        }
+        try{
+            reader.setId(resultSet.getLong("r.id"));
+            reader.setName(resultSet.getString("r.name"));
+        } catch (SQLException sqlException){
+            reader = null;
+        }
+
         borrow.setBook(book);
         borrow.setReader(reader);
         return borrow;

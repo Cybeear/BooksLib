@@ -1,24 +1,30 @@
 package repositories;
 
 import entities.Reader;
-import exceptions.ReaderDaoException;
-import services.ConnectionService;
+import entities.ReaderMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
-    private final ConnectionService connectionService;
+@Repository
+public class ReaderRepositoryPostgresqlImpl implements ReaderRepository {
 
-    public ReaderRepositoryPostgresqlImpl() {
-        connectionService = new ConnectionService();
-    }
+    private final JdbcTemplate jdbcTemplate;
 
-    public ReaderRepositoryPostgresqlImpl(ConnectionService connectionService) {
-        this.connectionService = connectionService;
+    @Autowired
+    public ReaderRepositoryPostgresqlImpl(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
     /**
@@ -28,20 +34,20 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
     @Override
     public Reader save(Reader reader) {
         var addNewBookSql = "INSERT INTO reader(name) VALUES(?)";
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(addNewBookSql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, reader.getName());
-            statement.executeUpdate();
-            var resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) {
-                reader.setId(resultSet.getLong(1));
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
+                        Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1, reader.getName());
+                return preparedStatement;
             }
-            resultSet.close();
-            return reader;
-        } catch (SQLException sqlException) {
-            throw new ReaderDaoException("[" + reader + "]!\n" +
-                    sqlException.getLocalizedMessage());
-        }
+        }, keyHolder);
+
+        reader.setId(keyHolder.getKey().longValue());
+        return reader;
     }
 
     /**
@@ -49,20 +55,8 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
      */
     @Override
     public List<Reader> findAll() {
-        var findAllBooksSql = "SELECT * FROM reader";
-        List<Reader> readerList = new ArrayList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findAllBooksSql);
-             var resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                readerList.add(new Reader(resultSet.getInt(1),
-                        resultSet.getString(2)));
-            }
-            return readerList;
-        } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find books!\n"
-                    + sqlException.getLocalizedMessage());
-        }
+        var findAllReadersSql = "SELECT * FROM reader";
+        return jdbcTemplate.query(findAllReadersSql, new ReaderMapper());
     }
 
     /**
@@ -72,20 +66,9 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
     @Override
     public Optional<Reader> findById(long readerId) {
         var findReaderByIdSql = "SELECT * FROM reader WHERE id = ?";
-        Reader reader = null;
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findReaderByIdSql)) {
-            statement.setLong(1, readerId);
-            var resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                reader = new Reader(resultSet.getLong(1), resultSet.getString(2));
-            }
-            resultSet.close();
-            return Optional.ofNullable(reader);
-        } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find reader by Id: "
-                    + readerId + "!\n" + sqlException.getLocalizedMessage());
-        }
+        return Optional.ofNullable(jdbcTemplate.queryForObject(findReaderByIdSql,
+                new ReaderMapper(),
+                readerId));
     }
 
     /**
@@ -101,20 +84,6 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
                 FROM reader r
                     LEFT JOIN borrow bor ON r.id = bor.reader_id
                 WHERE bor.book_id = ?""";
-        List<Reader> readers = new ArrayList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findAllReadersByBookIdSql)) {
-            statement.setLong(1, bookId);
-            var resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                readers.add(new Reader(resultSet.getLong(1),
-                        resultSet.getString(2)));
-            }
-            resultSet.close();
-            return readers;
-        } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find reader by book Id: "
-                    + bookId + "!\n" + sqlException.getLocalizedMessage());
-        }
+        return jdbcTemplate.query(findAllReadersByBookIdSql, new ReaderMapper(), bookId);
     }
 }

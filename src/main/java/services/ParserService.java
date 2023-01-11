@@ -1,7 +1,9 @@
 package services;
 
 import exceptions.ParserServiceException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ParserService {
 
     /**

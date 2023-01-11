@@ -4,8 +4,11 @@ import entities.Book;
 import entities.Borrow;
 import entities.Reader;
 import exceptions.LibraryServiceException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
 import repositories.*;
 
 import java.util.List;
@@ -15,59 +18,16 @@ import java.util.Optional;
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
-@Service
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class LibraryService {
 
     private BookDao bookDao;
     private ReaderDao readerDao;
     private BorrowDao borrowDao;
     private ParserService parserService;
-
-    public LibraryService(BookDao bookDao, ReaderDao readerDao, BorrowDao borrowDao, ParserService parserService) {
-        this.bookDao = bookDao;
-        this.readerDao = readerDao;
-        this.borrowDao = borrowDao;
-        this.parserService = parserService;
-    }
-
-    public LibraryService() {
-        this.bookDao = new BookDaoPostgresqlImpl();
-        this.readerDao = new ReaderDaoPostgresqlImpl();
-        this.borrowDao = new BorrowDaoPostgresqlImpl();
-        this.parserService = new ParserService();
-    }
-
-    public BookDao getBookDao() {
-        return bookDao;
-    }
-
-    public void setBookDao(BookDao bookDao) {
-        this.bookDao = bookDao;
-    }
-
-    public ReaderDao getReaderDao() {
-        return readerDao;
-    }
-
-    public void setReaderDao(ReaderDao readerDao) {
-        this.readerDao = readerDao;
-    }
-
-    public BorrowDao getBorrowDao() {
-        return borrowDao;
-    }
-
-    public void setBorrowDao(BorrowDao borrowDao) {
-        this.borrowDao = borrowDao;
-    }
-
-    public ParserService getParserService() {
-        return parserService;
-    }
-
-    public void setParserService(ParserService parserService) {
-        this.parserService = parserService;
-    }
 
     /**
      * Show all books in the list
@@ -147,7 +107,7 @@ public class LibraryService {
         var inputSplit = readerAndBookIds.split("/");
         var readerId = parserService.parseLong(inputSplit[0].trim());
         var bookId = parserService.parseLong(inputSplit[1].trim());
-        if (borrowDao.returnBook(bookId, readerId) == 0) {
+        if (borrowDao.returnBook(readerId, bookId) == 0) {
             throw new LibraryServiceException("Book or a Reader is not exists!");
         }
     }
