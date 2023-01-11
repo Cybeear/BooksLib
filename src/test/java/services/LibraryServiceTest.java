@@ -1,11 +1,11 @@
-package service;
+package services;
 
-import dao.BookDaoPostgresqlImpl;
-import dao.BorrowDaoPostgresqlImpl;
-import dao.ReaderDaoPostgresqlImpl;
-import entity.Book;
-import entity.Borrow;
-import entity.Reader;
+import repositories.BookDaoPostgresqlImpl;
+import repositories.BorrowDaoPostgresqlImpl;
+import repositories.ReaderDaoPostgresqlImpl;
+import entities.Book;
+import entities.Borrow;
+import entities.Reader;
 import exceptions.LibraryServiceException;
 import exceptions.ParserServiceException;
 import org.junit.jupiter.api.BeforeEach;

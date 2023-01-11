@@ -1,6 +1,6 @@
-package dao;
+package repositories;
 
-import entity.Book;
+import entities.Book;
 
 import java.util.List;
 import java.util.Optional;

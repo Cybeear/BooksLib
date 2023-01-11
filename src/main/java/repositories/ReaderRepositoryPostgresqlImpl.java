@@ -1,8 +1,8 @@
-package dao;
+package repositories;
 
-import entity.Reader;
+import entities.Reader;
 import exceptions.ReaderDaoException;
-import service.ConnectionService;
+import services.ConnectionService;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReaderDaoPostgresqlImpl implements ReaderDao {
+public class ReaderRepositoryPostgresqlImpl implements ReaderDao {
     private final ConnectionService connectionService;
 
-    public ReaderDaoPostgresqlImpl() {
+    public ReaderRepositoryPostgresqlImpl() {
         connectionService = new ConnectionService();
     }
 
-    public ReaderDaoPostgresqlImpl(ConnectionService connectionService) {
+    public ReaderRepositoryPostgresqlImpl(ConnectionService connectionService) {
         this.connectionService = connectionService;
     }
 
@@ -113,7 +113,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             resultSet.close();
             return readers;
         } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find readers by book Id: "
+            throw new ReaderDaoException("Failed to find reader by book Id: "
                     + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }

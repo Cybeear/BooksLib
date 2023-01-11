@@ -1,8 +1,8 @@
-package dao;
+package repositories;
 
-import entity.Book;
+import entities.Book;
 import exceptions.BookDaoException;
-import service.ConnectionService;
+import services.ConnectionService;
 
 import java.sql.SQLException;
 import java.sql.Statement;

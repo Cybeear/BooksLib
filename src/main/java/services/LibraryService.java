@@ -1,11 +1,11 @@
-package service;
+package services;
 
-import dao.*;
-import entity.Book;
-import entity.Borrow;
-import entity.Reader;
+import entities.Book;
+import entities.Borrow;
+import entities.Reader;
 import exceptions.LibraryServiceException;
 import org.apache.commons.lang3.StringUtils;
+import repositories.*;
 
 import java.util.List;
 import java.util.Optional;

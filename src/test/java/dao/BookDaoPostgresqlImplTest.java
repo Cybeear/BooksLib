@@ -1,12 +1,9 @@
-package dao;
+package repositories;
 
-import entity.Book;
-import exceptions.BookDaoException;
+import entities.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

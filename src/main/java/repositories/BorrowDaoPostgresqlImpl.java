@@ -1,10 +1,10 @@
-package dao;
+package repositories;
 
-import entity.Book;
-import entity.Borrow;
-import entity.Reader;
+import entities.Book;
+import entities.Borrow;
+import entities.Reader;
 import exceptions.BorrowDaoException;
-import service.ConnectionService;
+import services.ConnectionService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
