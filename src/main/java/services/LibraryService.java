@@ -5,6 +5,7 @@ import entities.Borrow;
 import entities.Reader;
 import exceptions.LibraryServiceException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 import repositories.*;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Optional;
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
+@Service
 public class LibraryService {
 
     private BookDao bookDao;
