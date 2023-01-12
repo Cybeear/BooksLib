@@ -1,6 +1,8 @@
 package services;
 
 import entities.Book;
+import exceptions.BookRepositoryException;
+import exceptions.BookServiceException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +38,11 @@ public class BookService {
      * Add new book to list
      */
     public Book addBook(Book book) {
-        return bookRepository.save(book);
+        try {
+            return bookRepository.save(book);
+        } catch (BookRepositoryException bookRepositoryException) {
+            throw new BookServiceException(bookRepositoryException.getLocalizedMessage());
+        }
     }
 
     /**

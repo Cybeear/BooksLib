@@ -3,7 +3,7 @@ package repositories;
 import entities.Book;
 import entities.Borrow;
 import entities.Reader;
-import exceptions.BorrowDaoException;
+import exceptions.BorrowRepositoryException;
 import services.ConnectionService;
 
 import java.sql.SQLException;
@@ -38,7 +38,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             statement.executeUpdate();
             return findBorrowByReaderIdAndBookId(readerId, bookId);
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("by reader Id: "
+            throw new BorrowRepositoryException("by reader Id: "
                     + readerId + " and book Id: " + bookId + "!\nThis reader is borrow this book!" + sqlException.getLocalizedMessage());
         }
     }
@@ -73,7 +73,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             resultSet.close();
             return Optional.ofNullable(borrow);
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("Failed to find borrowed data by reader Id"
+            throw new BorrowRepositoryException("Failed to find borrowed data by reader Id"
                     + readerId + " and book Id: " + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -104,7 +104,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrowList;
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("Failed to find borrowed data!\n"
+            throw new BorrowRepositoryException("Failed to find borrowed data!\n"
                     + sqlException.getLocalizedMessage());
         }
     }
@@ -191,7 +191,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             statement.setLong(2, bookId);
             return statement.executeUpdate();
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("Failed to return book with book Id:"
+            throw new BorrowRepositoryException("Failed to return book with book Id:"
                     + bookId + " and reader Id: " + readerId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -225,7 +225,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrows;
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("SqlError: " + sqlException.getLocalizedMessage());
+            throw new BorrowRepositoryException("SqlError: " + sqlException.getLocalizedMessage());
         }
     }
 
@@ -258,7 +258,7 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             }
             return borrows;
         } catch (SQLException sqlException) {
-            throw new BorrowDaoException("SqlError: " + sqlException.getLocalizedMessage());
+            throw new BorrowRepositoryException("SqlError: " + sqlException.getLocalizedMessage());
         }
     }
 }

@@ -1,7 +1,8 @@
 package services;
 
 import entities.Reader;
-import exceptions.LibraryServiceException;
+import exceptions.ReaderRepositoryException;
+import exceptions.ReaderServiceException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,10 +37,13 @@ public class ReaderService {
      */
     public Reader registerReader(String newReaderName) {
         if (newReaderName.isBlank()) {
-            throw new LibraryServiceException("Reader name can not be an empty string!");
+            throw new ReaderServiceException("Reader name can not be an empty string!");
         }
-        return readerRepository.save(
-                new Reader(newReaderName));
+        try {
+            return readerRepository.save(new Reader(newReaderName));
+        } catch (ReaderRepositoryException readerRepositoryException) {
+            throw new ReaderServiceException(readerRepositoryException.getLocalizedMessage());
+        }
     }
 
     public Optional<Reader> findById(Long readerId) {

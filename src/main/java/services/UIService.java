@@ -66,7 +66,7 @@ public class UIService {
             } else {
                 System.out.println("Database have not any books!");
             }
-        } catch (BookDaoException e) {
+        } catch (BookRepositoryException e) {
             System.err.println("Database error: " + e);
         }
     }
@@ -79,7 +79,7 @@ public class UIService {
             } else {
                 System.out.println("Database have not any readers!");
             }
-        } catch (ReaderDaoException e) {
+        } catch (ReaderRepositoryException e) {
             System.err.println("Database error: " + e);
         }
     }
@@ -92,7 +92,7 @@ public class UIService {
             System.out.println(reader + " successful registered!");
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create new reader: " + e.getMessage());
-        } catch (ReaderDaoException e) {
+        } catch (ReaderRepositoryException e) {
             System.err.println("Failed to save reader: " + e.getMessage());
         }
     }
@@ -105,7 +105,7 @@ public class UIService {
             System.out.println(book + " successful added!");
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create new book: " + e.getMessage());
-        } catch (BookDaoException e) {
+        } catch (BookRepositoryException e) {
             System.err.println("Failed to save book: " + e.getMessage());
         }
     }
@@ -120,7 +120,7 @@ public class UIService {
             System.err.println("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create borrow: " + e.getMessage());
-        } catch (BorrowDaoException e) {
+        } catch (BorrowRepositoryException e) {
             System.err.println("Failed to borrow a book: " + e.getMessage());
         }
     }
@@ -135,7 +135,7 @@ public class UIService {
             System.err.println("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to create borrow: " + e.getMessage());
-        } catch (BorrowDaoException e) {
+        } catch (BorrowRepositoryException e) {
             System.err.println("Failed to return book: " + e.getMessage());
         }
     }
@@ -154,7 +154,7 @@ public class UIService {
             System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to get books: " + e.getMessage());
-        } catch (BookDaoException e) {
+        } catch (BookRepositoryException e) {
             System.err.println("Failed to fetch books: " + e.getMessage());
         }
     }
@@ -173,7 +173,7 @@ public class UIService {
             System.err.println("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
             System.err.println("Failed to get readers: " + e.getMessage());
-        } catch (ReaderDaoException e) {
+        } catch (ReaderRepositoryException e) {
             System.err.println("Failed to fetch readers: " + e.getMessage());
         }
     }
@@ -186,7 +186,7 @@ public class UIService {
             } else {
                 System.out.println("No active readers at the moment!");
             }
-        } catch (BorrowDaoException e) {
+        } catch (BorrowRepositoryException e) {
             System.err.println("Database error: " + e.getMessage());
         }
     }
@@ -199,7 +199,7 @@ public class UIService {
             } else {
                 System.err.println("At the moment no books are borrowed!");
             }
-        } catch (BorrowDaoException e) {
+        } catch (BorrowRepositoryException e) {
             System.err.println("Database error: " + e.getMessage());
         }
     }

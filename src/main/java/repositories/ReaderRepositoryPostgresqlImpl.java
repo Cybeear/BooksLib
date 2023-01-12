@@ -2,7 +2,9 @@ package repositories;
 
 import entities.Reader;
 import entities.ReaderMapper;
+import exceptions.ReaderRepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -35,18 +37,21 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderRepository {
     public Reader save(Reader reader) {
         var addNewBookSql = "INSERT INTO reader(name) VALUES(?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
-                        Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, reader.getName());
-                return preparedStatement;
-            }
-        }, keyHolder);
-        reader.setId((Integer) keyHolder.getKeys().get("id"));
-        return reader;
+        try {
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                    PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
+                            Statement.RETURN_GENERATED_KEYS);
+                    preparedStatement.setString(1, reader.getName());
+                    return preparedStatement;
+                }
+            }, keyHolder);
+            reader.setId((Integer) keyHolder.getKeys().get("id"));
+            return reader;
+        } catch (DataAccessException dataAccessException) {
+            throw new ReaderRepositoryException(dataAccessException.getLocalizedMessage());
+        }
     }
 
     /**

@@ -1,6 +1,8 @@
 package services;
 
 import entities.Borrow;
+import exceptions.BorrowRepositoryException;
+import exceptions.BorrowServiceException;
 import exceptions.LibraryServiceException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,25 +33,17 @@ public class BorrowService {
      * add to borrowList if string not contains any characters other than numbers
      */
     public Optional<Borrow> borrowBook(Long bookId, Long readerId) {
-        return borrowRepository.save(bookId, readerId);
+        try {
+            return borrowRepository.save(bookId, readerId);
+        } catch (BorrowRepositoryException borrowDaoException) {
+            throw new BorrowServiceException(borrowDaoException.getMessage());
+        }
     }
 
-    /**
-     * @param readerAndBookIds Function call parser function, show error message
-     *                         and return to menu if string of arguments contains any characters other than numbers
-     *                         delete object from borrowList if string not contains any characters other than numbers
-     */
-    public void returnBook(String readerAndBookIds) {
-        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
-                || StringUtils.equals("/", readerAndBookIds)
-                || StringUtils.isBlank(readerAndBookIds)) {
-            throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
-        }
-        var inputSplit = readerAndBookIds.split("/");
-        var readerId = parserService.parseLong(inputSplit[0].trim());
-        var bookId = parserService.parseLong(inputSplit[1].trim());
+
+    public void returnBook(Long readerId, Long bookId) {
         if (borrowRepository.returnBook(readerId, bookId) == 0) {
-            throw new LibraryServiceException("Book or a Reader is not exists!");
+            throw new BorrowServiceException("Book or a Reader is not exists!");
         }
     }
 

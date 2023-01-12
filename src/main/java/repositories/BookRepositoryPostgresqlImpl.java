@@ -2,7 +2,9 @@ package repositories;
 
 import entities.Book;
 import entities.BookMapper;
+import exceptions.BookRepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -35,18 +37,22 @@ public class BookRepositoryPostgresqlImpl implements BookRepository {
     public Book save(Book book) {
         var addNewBookSql = "INSERT INTO book(name, author) VALUES(?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-                PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
-                        Statement.RETURN_GENERATED_KEYS);
-                preparedStatement.setString(1, book.getName());
-                preparedStatement.setString(2, book.getAuthor());
-                return preparedStatement;
-            }
-        }, keyHolder);
-        book.setId((Integer) keyHolder.getKeys().get("id"));
-        return book;
+        try {
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                    PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
+                            Statement.RETURN_GENERATED_KEYS);
+                    preparedStatement.setString(1, book.getName());
+                    preparedStatement.setString(2, book.getAuthor());
+                    return preparedStatement;
+                }
+            }, keyHolder);
+            book.setId((Integer) keyHolder.getKeys().get("id"));
+            return book;
+        } catch (DataAccessException dataAccessException) {
+            throw new BookRepositoryException(dataAccessException.getLocalizedMessage());
+        }
     }
 
     /**

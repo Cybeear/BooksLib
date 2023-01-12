@@ -1,7 +1,7 @@
 package repositories;
 
 import entities.Reader;
-import exceptions.ReaderDaoException;
+import exceptions.ReaderRepositoryException;
 import services.ConnectionService;
 
 import java.sql.SQLException;
@@ -39,7 +39,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             resultSet.close();
             return reader;
         } catch (SQLException sqlException) {
-            throw new ReaderDaoException("[" + reader + "]!\n" +
+            throw new ReaderRepositoryException("[" + reader + "]!\n" +
                     sqlException.getLocalizedMessage());
         }
     }
@@ -60,7 +60,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             }
             return readerList;
         } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find books!\n"
+            throw new ReaderRepositoryException("Failed to find books!\n"
                     + sqlException.getLocalizedMessage());
         }
     }
@@ -83,7 +83,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             resultSet.close();
             return Optional.ofNullable(reader);
         } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find reader by Id: "
+            throw new ReaderRepositoryException("Failed to find reader by Id: "
                     + readerId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -113,7 +113,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             resultSet.close();
             return readers;
         } catch (SQLException sqlException) {
-            throw new ReaderDaoException("Failed to find readers by book Id: "
+            throw new ReaderRepositoryException("Failed to find readers by book Id: "
                     + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }

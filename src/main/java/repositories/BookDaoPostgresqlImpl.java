@@ -1,7 +1,7 @@
 package repositories;
 
 import entities.Book;
-import exceptions.BookDaoException;
+import exceptions.BookRepositoryException;
 import services.ConnectionService;
 
 import java.sql.SQLException;
@@ -40,7 +40,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             resultSet.close();
             return book;
         } catch (SQLException sqlException) {
-            throw new BookDaoException("[" + book + "]!\n"
+            throw new BookRepositoryException("[" + book + "]!\n"
                     + sqlException.getLocalizedMessage());
         }
     }
@@ -62,7 +62,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             return bookList;
         } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find books!\n" + sqlException.getLocalizedMessage());
+            throw new BookRepositoryException("Failed to find books!\n" + sqlException.getLocalizedMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }
             return Optional.ofNullable(book);
         } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find book by Id: "
+            throw new BookRepositoryException("Failed to find book by Id: "
                     + bookId + "!\n" + sqlException.getLocalizedMessage());
         }
     }
@@ -117,7 +117,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             resultSet.close();
             return books;
         } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find books by reader Id: "
+            throw new BookRepositoryException("Failed to find books by reader Id: "
                     + readerId + "\n" + sqlException.getLocalizedMessage());
         }
     }

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BorrowRepository {
-    Optional<Borrow> save(long bookId, long readerId);
+    Optional<Borrow> save(Long bookId, Long readerId);
 
     List<Borrow> findAll();
 
@@ -14,5 +14,5 @@ public interface BorrowRepository {
 
     List<Borrow> findAllBooksWithTheirBorrowers();
 
-    int returnBook(long bookId, long readerId);
+    int returnBook(Long bookId, Long readerId);
 }
