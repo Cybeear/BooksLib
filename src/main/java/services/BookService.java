@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import repositories.BookRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -39,12 +40,20 @@ public class BookService {
     }
 
     /**
+     * @param bookId
+     * @return Return to menu if string of arguments contains any symbols other than numbers or
+     * print all borrow objects by reader id
+     */
+    public Optional<Book> getById(long bookId) {
+        return bookRepository.findById(bookId);
+    }
+
+    /**
      * @param readerId
      * @return Return to menu if string of arguments contains any symbols other than numbers or
      * print all borrow objects by reader id
      */
-    public List<Book> getAllBorrowedByReaderId(String readerId) {
-        var parsed = parserService.parseLong(readerId.trim());
-        return bookRepository.findAllByReaderId(parsed);
+    public List<Book> getAllBorrowedByReaderId(Long readerId) {
+        return bookRepository.findAllByReaderId(readerId);
     }
 }

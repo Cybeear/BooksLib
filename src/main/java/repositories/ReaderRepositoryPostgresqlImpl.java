@@ -45,8 +45,7 @@ public class ReaderRepositoryPostgresqlImpl implements ReaderRepository {
                 return preparedStatement;
             }
         }, keyHolder);
-
-        reader.setId(keyHolder.getKey().longValue());
+        reader.setId((Integer) keyHolder.getKeys().get("id"));
         return reader;
     }
 

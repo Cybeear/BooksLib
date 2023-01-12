@@ -45,7 +45,7 @@ public class BookRepositoryPostgresqlImpl implements BookRepository {
                 return preparedStatement;
             }
         }, keyHolder);
-        book.setId((Long)keyHolder.getKeys().get("id"));
+        book.setId((Integer) keyHolder.getKeys().get("id"));
         return book;
     }
 
@@ -82,6 +82,6 @@ public class BookRepositoryPostgresqlImpl implements BookRepository {
                 FROM book
                     LEFT JOIN borrow ON book.id = borrow.book_id
                 WHERE borrow.reader_id = ?""";
-        return jdbcTemplate.query(findAllBooksByReaderIdSql,  new BookMapper(), readerId);
+        return jdbcTemplate.query(findAllBooksByReaderIdSql, new BookMapper(), readerId);
     }
 }

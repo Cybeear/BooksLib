@@ -30,15 +30,7 @@ public class BorrowService {
      * and return to menu if string of arguments contains any characters other than numbers
      * add to borrowList if string not contains any characters other than numbers
      */
-    public Optional<Borrow> borrowBook(String readerAndBookIds) {
-        if (StringUtils.countMatches(readerAndBookIds, "/") != 1
-                || StringUtils.equals("/", readerAndBookIds)
-                || StringUtils.isBlank(readerAndBookIds)) {
-            throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
-        }
-        var inputSplit = readerAndBookIds.split("/");
-        var readerId = parserService.parseLong(inputSplit[0].trim());
-        var bookId = parserService.parseLong(inputSplit[1].trim());
+    public Optional<Borrow> borrowBook(Long bookId, Long readerId) {
         return borrowRepository.save(bookId, readerId);
     }
 
@@ -60,6 +52,12 @@ public class BorrowService {
             throw new LibraryServiceException("Book or a Reader is not exists!");
         }
     }
+
+    public List<Borrow> getAllBorrows() {
+        return borrowRepository.findAll();
+    }
+
+
     /**
      *
      */
