@@ -1,0 +1,20 @@
+---
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:49153/dev
+    username: postgres
+    password: postgrespw
+    driver-class-name: org.postgresql.Driver
+logging:
+  file:
+    name: myapplication.log
+  level:
+    root: INFO
+    sql: INFO
+    web: INFO
+  pattern:
+    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level)
+      %logger.%M - %msg%n"
+  logback:
+    rollingpolicy:
+      clean-history-on-start: false
