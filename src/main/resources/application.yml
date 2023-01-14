@@ -13,7 +13,7 @@ logging:
     sql: INFO
     web: INFO
   pattern:
-    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level)
+    console: "%d{dd-MM-yyyy HH:mm:ss.SSS} ([%thread]) %highlight(%-5level)
       %logger.%M - %msg%n"
   logback:
     rollingpolicy:
