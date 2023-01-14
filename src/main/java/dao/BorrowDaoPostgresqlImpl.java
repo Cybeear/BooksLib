@@ -4,6 +4,7 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 import exceptions.BorrowDaoException;
+import org.springframework.stereotype.Repository;
 import service.ConnectionService;
 
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public class BorrowDaoPostgresqlImpl implements BorrowDao {
     private final ConnectionService connectionService;
 

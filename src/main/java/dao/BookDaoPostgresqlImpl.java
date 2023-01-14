@@ -2,6 +2,7 @@ package dao;
 
 import entity.Book;
 import exceptions.BookDaoException;
+import org.springframework.stereotype.Repository;
 import service.ConnectionService;
 
 import java.sql.SQLException;
@@ -9,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public class BookDaoPostgresqlImpl implements BookDao {
     private final ConnectionService connectionService;
 
