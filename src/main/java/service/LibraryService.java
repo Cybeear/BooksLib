@@ -5,7 +5,12 @@ import entity.Book;
 import entity.Borrow;
 import entity.Reader;
 import exceptions.LibraryServiceException;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,58 +19,21 @@ import java.util.Optional;
 /**
  * LibraryService class used to interaction with data and objects in online Library
  */
+@Service
+@Getter
+@Setter
 public class LibraryService {
 
+    private static final Logger log = LoggerFactory.getLogger(BookDaoPostgresqlImpl.class);
+
+    @Autowired
     private BookDao bookDao;
+    @Autowired
     private ReaderDao readerDao;
+    @Autowired
     private BorrowDao borrowDao;
+    @Autowired
     private ParserService parserService;
-
-    public LibraryService(BookDao bookDao, ReaderDao readerDao, BorrowDao borrowDao, ParserService parserService) {
-        this.bookDao = bookDao;
-        this.readerDao = readerDao;
-        this.borrowDao = borrowDao;
-        this.parserService = parserService;
-    }
-
-    public LibraryService() {
-        this.bookDao = new BookDaoPostgresqlImpl();
-        this.readerDao = new ReaderDaoPostgresqlImpl();
-        this.borrowDao = new BorrowDaoPostgresqlImpl();
-        this.parserService = new ParserService();
-    }
-
-    public BookDao getBookDao() {
-        return bookDao;
-    }
-
-    public void setBookDao(BookDao bookDao) {
-        this.bookDao = bookDao;
-    }
-
-    public ReaderDao getReaderDao() {
-        return readerDao;
-    }
-
-    public void setReaderDao(ReaderDao readerDao) {
-        this.readerDao = readerDao;
-    }
-
-    public BorrowDao getBorrowDao() {
-        return borrowDao;
-    }
-
-    public void setBorrowDao(BorrowDao borrowDao) {
-        this.borrowDao = borrowDao;
-    }
-
-    public ParserService getParserService() {
-        return parserService;
-    }
-
-    public void setParserService(ParserService parserService) {
-        this.parserService = parserService;
-    }
 
     /**
      * Show all books in the list
@@ -86,6 +54,7 @@ public class LibraryService {
      */
     public Reader registerReader(String newReaderName) {
         if (newReaderName.isBlank()) {
+            log.info("Reader name can not be an empty string!");
             throw new LibraryServiceException("Reader name can not be an empty string!");
         }
         return readerDao.save(
@@ -99,12 +68,15 @@ public class LibraryService {
         if (StringUtils.countMatches(newBookData, "/") != 1
                 || StringUtils.equals("/", newBookData)
                 || StringUtils.isBlank(newBookData)) {
+            log.info("Input is incorrect!");
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = newBookData.split("/");
         if (inputSplit[0].isBlank()) {
+            log.info("Input is incorrect, you enter input book name!");
             throw new LibraryServiceException("Book name can not be an empty string!");
         } else if (inputSplit[1].isBlank()) {
+            log.info("Input is incorrect, you enter input book author!");
             throw new LibraryServiceException("Book author can not be an empty string!");
         }
         return bookDao.save(
@@ -122,6 +94,7 @@ public class LibraryService {
         if (StringUtils.countMatches(readerAndBookIds, "/") != 1
                 || StringUtils.equals("/", readerAndBookIds)
                 || StringUtils.isBlank(readerAndBookIds)) {
+            log.info("Input is incorrect!");
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = readerAndBookIds.split("/");
@@ -140,12 +113,14 @@ public class LibraryService {
         if (StringUtils.countMatches(readerAndBookIds, "/") != 1
                 || StringUtils.equals("/", readerAndBookIds)
                 || StringUtils.isBlank(readerAndBookIds)) {
+            log.info("Input is incorrect!");
             throw new LibraryServiceException("Your input is incorrect, you need to write name and author separated by '/'!");
         }
         var inputSplit = readerAndBookIds.split("/");
         var readerId = parserService.parseLong(inputSplit[0].trim());
         var bookId = parserService.parseLong(inputSplit[1].trim());
         if (borrowDao.returnBook(bookId, readerId) == 0) {
+            log.info("Book or a Reader is not exists!");
             throw new LibraryServiceException("Book or a Reader is not exists!");
         }
     }

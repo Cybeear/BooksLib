@@ -1,8 +1,15 @@
 package service;
 
+import dao.BookDaoPostgresqlImpl;
 import exceptions.ParserServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ParserService {
+
+    private static final Logger log = LoggerFactory.getLogger(BookDaoPostgresqlImpl.class);
 
     /**
      * @param str argument string

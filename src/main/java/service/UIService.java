@@ -1,24 +1,26 @@
 package service;
 
+import dao.BookDaoPostgresqlImpl;
 import exceptions.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
+@Service
+@Getter
+@Setter
 public class UIService {
-    private final LibraryService libraryService;
+
+    private static final Logger log = LoggerFactory.getLogger(BookDaoPostgresqlImpl.class);
+
+    @Autowired
+    private LibraryService libraryService;
     private final Scanner in = new Scanner(System.in);
-
-    public LibraryService getLibraryService() {
-        return libraryService;
-    }
-
-    public Scanner getIn() {
-        return in;
-    }
-
-    public UIService() {
-        libraryService = new LibraryService();
-    }
 
     public void drawMenu() {
         var str = """
@@ -36,7 +38,7 @@ public class UIService {
                 |                              [10]SHOW ALL BOOKS WITH THEIR BORROWERS                               |
                 |                             "TYPE 'exit' TO STOP THE PROGRAM AND EXIT!"                            |
                 -----------------------------------------------------------------------------------------------------""";
-        System.out.println(str);
+        log.info(str);
     }
 
     public void showMenu() {
@@ -64,10 +66,10 @@ public class UIService {
             if (!books.isEmpty()) {
                 books.forEach(System.out::println);
             } else {
-                System.out.println("Database have not any books!");
+                log.info("Database have not any books!");
             }
         } catch (BookDaoException e) {
-            System.err.println("Database error: " + e);
+            log.info("Database error: " + e);
         }
     }
 
@@ -77,10 +79,10 @@ public class UIService {
             if (!readers.isEmpty()) {
                 readers.forEach(System.out::println);
             } else {
-                System.out.println("Database have not any readers!");
+                log.info("Database have not any readers!");
             }
         } catch (ReaderDaoException e) {
-            System.err.println("Database error: " + e);
+            log.info("Database error: " + e);
         }
     }
 
@@ -89,11 +91,11 @@ public class UIService {
         try {
             var newReaderName = in.nextLine();
             var reader = libraryService.registerReader(newReaderName);
-            System.out.println(reader + " successful registered!");
+            log.info(reader + " successful registered!");
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to create new reader: " + e.getMessage());
+            log.info("Failed to create new reader: " + e.getMessage());
         } catch (ReaderDaoException e) {
-            System.err.println("Failed to save reader: " + e.getMessage());
+            log.info("Failed to save reader: " + e.getMessage());
         }
     }
 
@@ -102,11 +104,11 @@ public class UIService {
         try {
             var newBookData = in.nextLine();
             var book = libraryService.addBook(newBookData);
-            System.out.println(book + " successful added!");
+            log.info(book + " successful added!");
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to create new book: " + e.getMessage());
+            log.info("Failed to create new book: " + e.getMessage());
         } catch (BookDaoException e) {
-            System.err.println("Failed to save book: " + e.getMessage());
+            log.info("Failed to save book: " + e.getMessage());
         }
     }
 
@@ -115,13 +117,13 @@ public class UIService {
         try {
             var readeAndBookIds = in.nextLine();
             libraryService.borrowBook(readeAndBookIds).ifPresentOrElse(System.out::println,
-                    () -> System.err.println("Error: book or reader is not exists!"));
+                    () -> log.info("Error: book or reader is not exists!"));
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse reader id or book id: " + e.getMessage());
+            log.info("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to create borrow: " + e.getMessage());
+            log.info("Failed to create borrow: " + e.getMessage());
         } catch (BorrowDaoException e) {
-            System.err.println("Failed to borrow a book: " + e.getMessage());
+            log.info("Failed to borrow a book: " + e.getMessage());
         }
     }
 
@@ -130,13 +132,13 @@ public class UIService {
         try {
             var readeAndBookIds = in.nextLine();
             libraryService.returnBook(readeAndBookIds);
-            System.out.println("Book is returned!");
+            log.info("Book is returned!");
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse reader id or book id: " + e.getMessage());
+            log.info("Failed to parse reader id or book id: " + e.getMessage());
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to create borrow: " + e.getMessage());
+            log.info("Failed to create borrow: " + e.getMessage());
         } catch (BorrowDaoException e) {
-            System.err.println("Failed to return book: " + e.getMessage());
+            log.info("Failed to return book: " + e.getMessage());
         }
     }
 
@@ -148,14 +150,14 @@ public class UIService {
             if (!books.isEmpty()) {
                 books.forEach(System.out::println);
             } else {
-                System.out.println("This reader isn`t borrow books!");
+                log.info("This reader isn`t borrow books!");
             }
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse reader id: " + e.getMessage());
+            log.info("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to get books: " + e.getMessage());
+            log.info("Failed to get books: " + e.getMessage());
         } catch (BookDaoException e) {
-            System.err.println("Failed to fetch books: " + e.getMessage());
+            log.info("Failed to fetch books: " + e.getMessage());
         }
     }
 
@@ -167,14 +169,14 @@ public class UIService {
             if (!readers.isEmpty()) {
                 readers.forEach(System.out::println);
             } else {
-                System.out.println("This book isn`t borrowed!");
+                log.info("This book isn`t borrowed!");
             }
         } catch (ParserServiceException e) {
-            System.err.println("Failed to parse reader id: " + e.getMessage());
+            log.info("Failed to parse reader id: " + e.getMessage());
         } catch (LibraryServiceException e) {
-            System.err.println("Failed to get readers: " + e.getMessage());
+            log.info("Failed to get readers: " + e.getMessage());
         } catch (ReaderDaoException e) {
-            System.err.println("Failed to fetch readers: " + e.getMessage());
+            log.info("Failed to fetch readers: " + e.getMessage());
         }
     }
 
@@ -184,10 +186,10 @@ public class UIService {
             if (!borrows.isEmpty()) {
                 borrows.forEach(System.out::println);
             } else {
-                System.out.println("No active readers at the moment!");
+                log.info("No active readers at the moment!");
             }
         } catch (BorrowDaoException e) {
-            System.err.println("Database error: " + e.getMessage());
+            log.info("Database error: " + e.getMessage());
         }
     }
 
@@ -197,10 +199,10 @@ public class UIService {
             if (!borrows.isEmpty()) {
                 borrows.forEach(System.out::println);
             } else {
-                System.err.println("At the moment no books are borrowed!");
+                log.info("At the moment no books are borrowed!");
             }
         } catch (BorrowDaoException e) {
-            System.err.println("Database error: " + e.getMessage());
+            log.info("Database error: " + e.getMessage());
         }
     }
 }
