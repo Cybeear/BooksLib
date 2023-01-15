@@ -9,6 +9,7 @@ import com.bookslib.app.entity.Borrow;
 import com.bookslib.app.entity.Reader;
 import com.bookslib.app.exceptions.LibraryServiceException;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,9 @@ import java.util.Optional;
 @Getter
 @Setter
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
 public class LibraryService {
 
-    private static final Logger log = LoggerFactory.getLogger(BookDaoPostgresqlImpl.class);
     private BookDao bookDao;
     private ReaderDao readerDao;
     private BorrowDao borrowDao;
@@ -52,7 +53,6 @@ public class LibraryService {
      */
     public Reader registerReader(String newReaderName) {
         if (newReaderName.isBlank()) {
-            log.info("Reader name can not be an empty string!");
             throw new LibraryServiceException("Reader name can not be an empty string!");
         }
         return readerDao.save(
@@ -71,10 +71,8 @@ public class LibraryService {
         }*/
         var inputSplit = newBookData.split("/");
         if (inputSplit[0].isBlank()) {
-            log.info("Input is incorrect, you enter input book name!");
             throw new LibraryServiceException("Book name can not be an empty string!");
         } else if (inputSplit[1].isBlank()) {
-            log.info("Input is incorrect, you enter input book author!");
             throw new LibraryServiceException("Book author can not be an empty string!");
         }
         return bookDao.save(
@@ -118,7 +116,7 @@ public class LibraryService {
         var readerId = parserService.parseLong(inputSplit[0].trim());
         var bookId = parserService.parseLong(inputSplit[1].trim());
         if (borrowDao.returnBook(bookId, readerId) == 0) {
-            log.info("Book or a Reader is not exists!");
+            log.error("Book or a Reader is not exists!");
             throw new LibraryServiceException("Book or a Reader is not exists!");
         }
     }
