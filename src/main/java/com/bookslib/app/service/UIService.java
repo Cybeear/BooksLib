@@ -1,14 +1,11 @@
 package com.bookslib.app.service;
 
-import com.bookslib.app.dao.BookDaoPostgresqlImpl;
 import com.bookslib.app.exceptions.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
@@ -16,12 +13,11 @@ import java.util.Scanner;
 @Service
 @Getter
 @Setter
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@Slf4j
+@RequiredArgsConstructor
 public class UIService {
-
-    private static final Logger log = LoggerFactory.getLogger(BookDaoPostgresqlImpl.class);
-
-    private LibraryService libraryService;
+    @NonNull
+    private final LibraryService libraryService;
     private final Scanner in = new Scanner(System.in);
 
     public void drawMenu() {

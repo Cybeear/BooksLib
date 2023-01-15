@@ -1,18 +1,17 @@
 package com.bookslib.app.service;
 
 import com.bookslib.app.dao.BookDao;
-import com.bookslib.app.dao.BookDaoPostgresqlImpl;
 import com.bookslib.app.dao.BorrowDao;
 import com.bookslib.app.dao.ReaderDao;
 import com.bookslib.app.entity.Book;
 import com.bookslib.app.entity.Borrow;
 import com.bookslib.app.entity.Reader;
 import com.bookslib.app.exceptions.LibraryServiceException;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,14 +24,17 @@ import java.util.Optional;
 @Service
 @Getter
 @Setter
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 @Slf4j
 public class LibraryService {
-
-    private BookDao bookDao;
-    private ReaderDao readerDao;
-    private BorrowDao borrowDao;
-    private ParserService parserService;
+    @NonNull
+    private final BookDao bookDao;
+    @NonNull
+    private final ReaderDao readerDao;
+    @NonNull
+    private final BorrowDao borrowDao;
+    @NonNull
+    private final ParserService parserService;
 
     /**
      * Show all books in the list

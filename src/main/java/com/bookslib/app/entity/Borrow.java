@@ -2,11 +2,9 @@ package com.bookslib.app.entity;
 
 import lombok.*;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Borrow {
     private Book book;
     private Reader reader;

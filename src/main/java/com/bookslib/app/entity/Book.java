@@ -2,24 +2,16 @@ package com.bookslib.app.entity;
 
 import lombok.*;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-@Getter
-@Setter
-@EqualsAndHashCode
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
+@RequiredArgsConstructor
+@NoArgsConstructor
 public class Book {
-    private static AtomicLong counter = new AtomicLong(1000L);
     private long id;
+    @NonNull
     private String name;
+    @NonNull
     private String author;
-
-    public Book(String name, String author) {
-        this.id = counter.incrementAndGet();
-        this.name = name;
-        this.author = author;
-    }
 
     @Override
     public String toString() {

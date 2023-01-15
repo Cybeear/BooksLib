@@ -1,7 +1,6 @@
 package com.bookslib.app.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,19 +11,16 @@ import java.util.Calendar;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/welcome")
+@RequestMapping("/api/v1/library/welcome")
+@Slf4j
 public class WelcomeController {
-
-    private static final Logger log = LoggerFactory.getLogger(WelcomeController.class);
 
     @GetMapping
     public ResponseEntity<Map<String, String>> welcome() {
         var response = Map.of(
-                "message", "Welcome to the library",
-                "date", new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime())
-        );
+                "date", new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime()),
+                "message", "Welcome to the library"
+                );
         return ResponseEntity.ok(response);
-
     }
-
 }
