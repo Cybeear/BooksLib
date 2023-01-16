@@ -2,26 +2,25 @@ package com.bookslib.app.dao;
 
 import com.bookslib.app.entity.Book;
 import com.bookslib.app.exceptions.BookDaoException;
+import com.bookslib.app.mapper.BookMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import com.bookslib.app.service.ConnectionService;
 
-import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Slf4j
 public class BookDaoPostgresqlImpl implements BookDao {
-    private final ConnectionService connectionService;
-
-    public BookDaoPostgresqlImpl() {
-        this.connectionService = new ConnectionService();
-    }
-
-    public BookDaoPostgresqlImpl(ConnectionService connectionService) {
-        this.connectionService = connectionService;
-    }
+    private JdbcTemplate jdbcTemplate;
 
     /**
      * @param book
@@ -30,20 +29,20 @@ public class BookDaoPostgresqlImpl implements BookDao {
     @Override
     public Book save(Book book) {
         var addNewBookSql = "INSERT INTO book(name, author) VALUES(?, ?)";
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(addNewBookSql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, book.getName());
-            statement.setString(2, book.getAuthor());
-            statement.executeUpdate();
-            var resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) {
-                book.setId(resultSet.getLong(1));
-            }
-            resultSet.close();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement preparedStatement = connection.prepareStatement(addNewBookSql,
+                        Statement.RETURN_GENERATED_KEYS);
+                preparedStatement.setString(1, book.getName());
+                preparedStatement.setString(2, book.getAuthor());
+                return preparedStatement;
+            }, keyHolder);
+            book.setId((Integer) keyHolder.getKeys().get("id"));
             return book;
-        } catch (SQLException sqlException) {
-            throw new BookDaoException("[" + book + "]!\n"
-                    + sqlException.getLocalizedMessage());
+        } catch (DataAccessException dataAccessException) {
+            log.error("Error save book!\t{}", book);
+            throw new BookDaoException(dataAccessException.getLocalizedMessage());
         }
     }
 
@@ -53,18 +52,11 @@ public class BookDaoPostgresqlImpl implements BookDao {
     @Override
     public List<Book> findAll() {
         var findAllBooksSql = "SELECT * FROM book";
-        List<Book> bookList = new ArrayList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findAllBooksSql);
-             var resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                bookList.add(new Book(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3)));
-            }
-            return bookList;
-        } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find books!\n" + sqlException.getLocalizedMessage());
+        try {
+            return jdbcTemplate.query(findAllBooksSql, new BookMapper());
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            log.warn("Statement return empty result set!");
+            return new ArrayList<>();
         }
     }
 
@@ -75,20 +67,11 @@ public class BookDaoPostgresqlImpl implements BookDao {
     @Override
     public Optional<Book> findById(long bookId) {
         var findBookByIdSql = "SELECT * FROM book WHERE id = ?";
-        Book book = null;
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findBookByIdSql)) {
-            statement.setLong(1, bookId);
-            var resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                book = new Book(resultSet.getLong(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
-            }
-            return Optional.ofNullable(book);
-        } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find book by Id: "
-                    + bookId + "!\n" + sqlException.getLocalizedMessage());
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(findBookByIdSql, new BookMapper(), bookId));
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            log.warn("Statement return empty result set!\tbook id - {}", bookId);
+            return Optional.empty();
         }
     }
 
@@ -106,21 +89,11 @@ public class BookDaoPostgresqlImpl implements BookDao {
                 FROM book b
                     LEFT JOIN borrow bor ON b.id = bor.book_id
                 WHERE bor.reader_id = ?""";
-        List<Book> books = new ArrayList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(findAllBooksByReaderIdSql)) {
-            statement.setLong(1, readerId);
-            var resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                books.add(new Book(resultSet.getLong(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3)));
-            }
-            resultSet.close();
-            return books;
-        } catch (SQLException sqlException) {
-            throw new BookDaoException("Failed to find books by reader Id: "
-                    + readerId + "\n" + sqlException.getLocalizedMessage());
+        try {
+            return jdbcTemplate.query(findAllBooksByReaderIdSql, new BookMapper(), readerId);
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            log.warn("Statement return empty result set! \treader id - {}", readerId);
+            return new ArrayList<>();
         }
     }
 }
