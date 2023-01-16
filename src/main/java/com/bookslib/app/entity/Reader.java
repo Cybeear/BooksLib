@@ -1,15 +1,15 @@
 package com.bookslib.app.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@NoArgsConstructor
 public class Reader {
     private long id;
-    @NonNull
-    private String name;
+    private final String name;
 
     @Override
     public String toString() {

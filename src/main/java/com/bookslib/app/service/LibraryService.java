@@ -7,10 +7,7 @@ import com.bookslib.app.entity.Book;
 import com.bookslib.app.entity.Borrow;
 import com.bookslib.app.entity.Reader;
 import com.bookslib.app.exceptions.LibraryServiceException;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +19,12 @@ import java.util.Optional;
  * LibraryService class used to interaction with data and objects in online Library
  */
 @Service
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
 @Slf4j
 public class LibraryService {
-    @NonNull
     private final BookDao bookDao;
-    @NonNull
     private final ReaderDao readerDao;
-    @NonNull
     private final BorrowDao borrowDao;
-    @NonNull
     private final ParserService parserService;
 
     /**

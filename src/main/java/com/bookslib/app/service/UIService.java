@@ -1,22 +1,16 @@
 package com.bookslib.app.service;
 
 import com.bookslib.app.exceptions.*;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Scanner;
 
 @Service
-@Getter
-@Setter
+@Data
 @Slf4j
-@RequiredArgsConstructor
 public class UIService {
-    @NonNull
     private final LibraryService libraryService;
     private final Scanner in = new Scanner(System.in);
 
