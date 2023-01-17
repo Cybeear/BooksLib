@@ -1,16 +1,23 @@
 package com.bookslib.app.entity;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class Book {
     private long id;
-    private final String name;
-    private final String author;
+    @Pattern(regexp = "[^0-9]*", message = "Book name must contain only letters")
+    @Size(message = "Book name must be longer then 5 and less then 20 characters", min = 5, max = 20)
+    @NotBlank(message = "Book name is missing")
+    private String name;
+    @Pattern(regexp = "[^0-9]*", message = "Book author must contain only letters")
+    @Size(message = "Book author must be longer then 5 and less then 20 characters", min = 5, max = 20)
+    @NotBlank(message = "Book author is missing")
+    private String author;
 
     @Override
     public String toString() {

@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/library/welcome")
+@RequestMapping("/welcome")
 @Slf4j
 public class WelcomeController {
 

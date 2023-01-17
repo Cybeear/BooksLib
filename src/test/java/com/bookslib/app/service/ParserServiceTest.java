@@ -1,7 +1,6 @@
 package com.bookslib.app.service;
 
 import com.bookslib.app.exceptions.ParserServiceException;
-import com.bookslib.app.service.ParserService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

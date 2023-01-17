@@ -3,6 +3,7 @@ package com.bookslib.app.dao;
 import com.bookslib.app.entity.Book;
 import com.bookslib.app.exceptions.BookDaoException;
 import com.bookslib.app.mapper.BookMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -18,9 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@RequiredArgsConstructor
 @Slf4j
 public class BookDaoPostgresqlImpl implements BookDao {
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * @param book
@@ -41,7 +43,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
             book.setId((Integer) keyHolder.getKeys().get("id"));
             return book;
         } catch (DataAccessException dataAccessException) {
-            log.error("Error save book!\t{}", book);
+            log.info("Error save book!\t{}", book);
             throw new BookDaoException(dataAccessException.getLocalizedMessage());
         }
     }
@@ -55,7 +57,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
         try {
             return jdbcTemplate.query(findAllBooksSql, new BookMapper());
         } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
-            log.warn("Statement return empty result set!");
+            log.info("Statement return empty result set!");
             return new ArrayList<>();
         }
     }
@@ -70,7 +72,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(findBookByIdSql, new BookMapper(), bookId));
         } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
-            log.warn("Statement return empty result set!\tbook id - {}", bookId);
+            log.info("Statement return empty result set!\tbook id - {}", bookId);
             return Optional.empty();
         }
     }
@@ -92,7 +94,7 @@ public class BookDaoPostgresqlImpl implements BookDao {
         try {
             return jdbcTemplate.query(findAllBooksByReaderIdSql, new BookMapper(), readerId);
         } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
-            log.warn("Statement return empty result set! \treader id - {}", readerId);
+            log.info("Statement return empty result set!");
             return new ArrayList<>();
         }
     }
