@@ -18,7 +18,6 @@ import java.util.Set;
 @JsonTypeInfo(include = JsonTypeInfo.As.WRAPPER_OBJECT, use = JsonTypeInfo.Id.NAME, property = "error", visible = true)
 public class ApiError {
 
-    private HttpStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
     private String message;
@@ -28,20 +27,18 @@ public class ApiError {
         timestamp = LocalDateTime.now();
     }
 
-    public ApiError(HttpStatus status) {
+    public ApiError(Throwable ex) {
         this();
-        this.status = status;
-    }
-
-    public ApiError(HttpStatus status, Throwable ex) {
-        this();
-        this.status = status;
         this.message = "Unexpected error";
     }
 
-    public ApiError(HttpStatus status, String message, Throwable ex) {
+    public ApiError(String message) {
         this();
-        this.status = status;
+        this.message = message;
+    }
+
+    public ApiError(String message, Throwable ex) {
+        this();
         this.message = message;
     }
 
