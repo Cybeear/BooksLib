@@ -9,4 +9,4 @@ spring:
 server:
   port: 8081
   servlet:
-    context-path: "/bookslib/api/v1/library"
+    context-path: "/bookslib"

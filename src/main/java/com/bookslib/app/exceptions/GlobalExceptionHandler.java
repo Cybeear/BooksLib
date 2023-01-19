@@ -21,12 +21,6 @@ import java.util.List;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    /*@ExceptionHandler({NoHandlerFoundException.class})
-    public ResponseEntity<ApiError> handleNoHandlerFoundException(NoHandlerFoundException ex) {
-        var apiError = new ApiError("Specified path not found on this server", ex);
-        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
-    }*/
-
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         var error = "Malformed JSON request";

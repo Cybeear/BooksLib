@@ -21,7 +21,7 @@ public class ApiError {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime timestamp;
     private String message;
-    private List<ApiSubError> subErrors;
+    private List<ApiValidationError> subErrors;
 
     private ApiError() {
         timestamp = LocalDateTime.now();
@@ -42,7 +42,7 @@ public class ApiError {
         this.message = message;
     }
 
-    private void addSubError(ApiSubError subError) {
+    private void addSubError(ApiValidationError subError) {
         if (subErrors == null) {
             subErrors = new ArrayList<>();
         }
