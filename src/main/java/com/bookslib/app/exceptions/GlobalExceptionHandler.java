@@ -14,12 +14,20 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler({NoHandlerFoundException.class})
+    public ResponseEntity<ApiError> handlerNoHandlerFoundException(NoHandlerFoundException ex) {
+        var error = new ApiError(String.format("It`s invalid URL: %s",
+                ex.getRequestURL()));
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
@@ -29,7 +37,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
-    public ResponseEntity<Object> handleNoHandlerFoundException(HttpRequestMethodNotSupportedException ex) {
+    public ResponseEntity<Object> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         ApiError apiError = new ApiError(String.format("Could not find the %s method for URL %s",
                 ex.getMethod(),
                 ex.getMessage()));

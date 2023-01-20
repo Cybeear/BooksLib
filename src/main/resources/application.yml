@@ -5,6 +5,11 @@ spring:
     username: postgres
     password: postgrespw
     driver-class-name: org.postgresql.Driver
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
 
 server:
   port: 8081
