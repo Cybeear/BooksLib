@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -27,14 +26,10 @@ public class BookDaoPostgresqlImpl implements BookDao {
 
     public Book mapToBook(ResultSet resultSet, int rowNum) throws SQLException {
         var book = new Book();
-        try {
-            book.setId(resultSet.getLong("id"));
-            book.setName(resultSet.getString("name"));
-            book.setAuthor(resultSet.getString("author"));
-            return book;
-        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
-            return book;
-        }
+        book.setId(resultSet.getLong("id"));
+        book.setName(resultSet.getString("name"));
+        book.setAuthor(resultSet.getString("author"));
+        return book;
     }
 
     /**

@@ -24,16 +24,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({NoHandlerFoundException.class})
     public ResponseEntity<ApiError> handlerNoHandlerFoundException(NoHandlerFoundException ex) {
-        var error = new ApiError(String.format("It`s invalid URL: %s",
+        var apiError = new ApiError(String.format("It`s invalid URL: %s",
                 ex.getRequestURL()));
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         var error = "Malformed JSON request";
         var apiError = new ApiError(error, ex);
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
@@ -41,7 +43,7 @@ public class GlobalExceptionHandler {
         ApiError apiError = new ApiError(String.format("Could not find the %s method for URL %s",
                 ex.getMethod(),
                 ex.getMessage()));
-        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     @ExceptionHandler({MissingServletRequestParameterException.class})
@@ -49,7 +51,7 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException ex) {
         String error = ex.getParameterName() + " parameter is missing";
         var apiError = new ApiError(error, ex);
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
@@ -59,14 +61,14 @@ public class GlobalExceptionHandler {
         builder.append(" - media type is not supported. Supported media types are :");
         ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
         var apiError = new ApiError(builder.substring(0, builder.length() - 2), ex);
-        return new ResponseEntity<>(apiError, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(apiError);
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException ex) {
         var apiError = new ApiError("Request body contains invalid values!");
         apiError.addValidationErrors(ex.getConstraintViolations());
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -74,7 +76,7 @@ public class GlobalExceptionHandler {
         var apiError = new ApiError("Request body contains invalid values!");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
@@ -87,7 +89,7 @@ public class GlobalExceptionHandler {
                 List.of(new ApiValidationError(ex.getName(),
                         ex.getValue(),
                         ex.getLocalizedMessage())));
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
 
     }
 }
