@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public class BorrowDaoPostgresqlImpl implements BorrowDao {
     private final ConnectionService connectionService;
@@ -64,11 +65,13 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
             statement.setLong(2, bookId);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                Book book = new Book(resultSet.getLong(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
-                Reader reader = new Reader(resultSet.getInt(4),
-                        resultSet.getString(5));
+                var book = new Book();
+                book.setId(resultSet.getLong(1));
+                book.setName(resultSet.getString(2));
+                book.setAuthor(resultSet.getString(3));
+                var reader = new Reader();
+                reader.setId(resultSet.getInt(4));
+                reader.setName(resultSet.getString(5));
                 borrow = new Borrow(book, reader);
             }
             resultSet.close();
@@ -96,11 +99,13 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
              var statement = connection.prepareStatement(findAllBorrowsSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                var book = new Book(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
-                var reader = new Reader(resultSet.getInt(4),
-                        resultSet.getString(5));
+                var book = new Book();
+                book.setId(resultSet.getLong(1));
+                book.setName(resultSet.getString(2));
+                book.setAuthor(resultSet.getString(3));
+                var reader = new Reader();
+                reader.setId(resultSet.getInt(4));
+                reader.setName(resultSet.getString(5));
                 borrowList.add(new Borrow(book, reader));
             }
             return borrowList;
@@ -109,73 +114,6 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
                     + sqlException.getLocalizedMessage());
         }
     }
-
-    /**
-     * @param readerId
-     * @return
-     */
-    /*@Override
-    public List<Borrow> findAllBorrowedByReaderId(long readerId) {
-        var sql = """
-                SELECT
-                b.id, b.name, b.author,
-                r.id, r.name
-                FROM borrow bor
-                    JOIN book b ON b.id = bor.book_id
-                    JOIN reader r ON r.id = bor.reader_id
-                WHERE r.id = ?""";
-        List<Borrow> borrows = new LinkedList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, readerId);
-            var resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                var book = new Book(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
-                var reader = new Reader(resultSet.getInt(4),
-                        resultSet.getString(5));
-                borrows.add(new Borrow(book, reader));
-            }
-            return borrows;
-        } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find borrow data by reader Id: "
-                    + readerId + "!\n" + sqlException.getLocalizedMessage());
-        }
-    }
-
-    *//**
-     * @param bookId
-     * @return
-     *//*
-    @Override
-    public List<Borrow> findAllBorrowedByBookId(long bookId) {
-        var sql = """
-                SELECT
-                b.id, b.name, b.author,
-                r.id, r.name
-                FROM borrow bor
-                    JOIN book b ON b.id = bor.book_id
-                    JOIN reader r ON r.id = bor.reader_id WHERE b.id = ?""";
-        List<Borrow> borrows = new LinkedList<>();
-        try (var connection = connectionService.createConnection();
-             var statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, bookId);
-            var resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                var book = new Book(resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3));
-                var reader = new Reader(resultSet.getInt(4),
-                        resultSet.getString(5));
-                borrows.add(new Borrow(book, reader));
-            }
-            return borrows;
-        } catch (SQLException sqlException) {
-            throw new RuntimeException("Failed to find data by book Id: "
-                    + bookId + "!\n" + sqlException.getLocalizedMessage());
-        }
-    }*/
 
     /**
      * @param bookId
@@ -204,8 +142,8 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
         List<Borrow> borrows = new ArrayList<>();
         var findAllReadersAndTheirBorrowsSql = """
                 SELECT
-                r.id AS reader_id, r.name AS reader_name,
-                b.id AS book_id, b.name AS book_name, b.author AS book_author
+                b.id AS b_id, b.name AS b_name, b.author AS b_author,
+                r.id AS r_id, r.name AS r_name
                 FROM reader r
                     LEFT JOIN borrow bor on r.id = bor.reader_id
                     LEFT JOIN book b on b.id = bor.book_id
@@ -214,13 +152,14 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
              var statement = connection.prepareStatement(findAllReadersAndTheirBorrowsSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                Book book = null;
-                Reader reader = new Reader(resultSet.getLong(1),
-                        resultSet.getString(2));
-                if (resultSet.getLong("book_id") != 0) {
-                    book = new Book(resultSet.getLong(3),
-                            resultSet.getString(4),
-                            resultSet.getString(5));
+                var reader = new Reader();
+                var book = new Book();
+                reader.setId(resultSet.getLong("r_id"));
+                reader.setName(resultSet.getString("r_name"));
+                if (resultSet.getLong("b_id") != 0) {
+                    book.setId(resultSet.getLong("b_id"));
+                    book.setName(resultSet.getString("b_name"));
+                    book.setAuthor(resultSet.getString("b_author"));
                 }
                 borrows.add(new Borrow(book, reader));
             }
@@ -237,8 +176,8 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
         List<Borrow> borrows = new ArrayList<>();
         var findAllBooksAndTheirBorrowersSql = """
                 SELECT
-                r.id AS reader_id, r.name AS reader_name,
-                b.id AS book_id, b.name AS book_name, b.author AS book_author
+                b.id AS b_id, b.name AS b_name, b.author AS b_author,
+                r.id AS r_id, r.name AS r_name
                 FROM book b
                     LEFT JOIN borrow bor on b.id = bor.book_id
                     LEFT JOIN reader r on r.id = bor.reader_id
@@ -247,13 +186,14 @@ public class BorrowDaoPostgresqlImpl implements BorrowDao {
              var statement = connection.prepareStatement(findAllBooksAndTheirBorrowersSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                Book book = new Book(resultSet.getLong(3),
-                        resultSet.getString(4),
-                        resultSet.getString(5));
-                Reader reader = null;
-                if (resultSet.getLong("reader_id") != 0) {
-                    reader = new Reader(resultSet.getLong(1),
-                            resultSet.getString(2));
+                var book = new Book();
+                book.setId(resultSet.getLong("b_id"));
+                book.setName(resultSet.getString("b_name"));
+                book.setAuthor(resultSet.getString("b_author"));
+                var reader = new Reader();
+                if (resultSet.getLong("r_id") != 0) {
+                    reader.setId(resultSet.getLong("r_id"));
+                    reader.setName(resultSet.getString("r_name"));
                 }
                 borrows.add(new Borrow(book, reader));
             }

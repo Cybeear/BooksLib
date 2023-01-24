@@ -2,14 +2,15 @@ package com.bookslib.app.dao;
 
 import com.bookslib.app.entity.Reader;
 import com.bookslib.app.exceptions.ReaderDaoException;
-import org.springframework.stereotype.Repository;
 import com.bookslib.app.service.ConnectionService;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 public class ReaderDaoPostgresqlImpl implements ReaderDao {
     private final ConnectionService connectionService;
@@ -56,8 +57,10 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
              var statement = connection.prepareStatement(findAllBooksSql);
              var resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                readerList.add(new Reader(resultSet.getInt(1),
-                        resultSet.getString(2)));
+                var reader = new Reader();
+                reader.setId(resultSet.getInt(1));
+                reader.setName(resultSet.getString(2));
+                readerList.add(reader);
             }
             return readerList;
         } catch (SQLException sqlException) {
@@ -73,16 +76,18 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
     @Override
     public Optional<Reader> findById(long readerId) {
         var findReaderByIdSql = "SELECT * FROM reader WHERE id = ?";
-        Reader reader = null;
+        var reader = new Reader();
         try (var connection = connectionService.createConnection();
              var statement = connection.prepareStatement(findReaderByIdSql)) {
             statement.setLong(1, readerId);
             var resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                reader = new Reader(resultSet.getLong(1), resultSet.getString(2));
+                reader.setId(resultSet.getLong(1));
+                reader.setName(resultSet.getString(2));
+                resultSet.close();
+                return Optional.of(reader);
             }
-            resultSet.close();
-            return Optional.ofNullable(reader);
+            return Optional.empty();
         } catch (SQLException sqlException) {
             throw new ReaderDaoException("Failed to find reader by Id: "
                     + readerId + "!\n" + sqlException.getLocalizedMessage());
@@ -108,8 +113,10 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             statement.setLong(1, bookId);
             var resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                readers.add(new Reader(resultSet.getLong(1),
-                        resultSet.getString(2)));
+                var reader = new Reader();
+                reader.setId(resultSet.getLong(1));
+                reader.setName(resultSet.getString(2));
+                readers.add(reader);
             }
             resultSet.close();
             return readers;
