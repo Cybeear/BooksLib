@@ -1,4 +1,4 @@
-package com.bookslib.app.exceptions;
+package com.bookslib.app.api;
 
 import com.bookslib.app.entity.ApiError;
 import com.bookslib.app.entity.ApiValidationError;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionController {
 
     @ExceptionHandler({NoHandlerFoundException.class})
     public ResponseEntity<ApiError> handlerNoHandlerFoundException(NoHandlerFoundException ex) {

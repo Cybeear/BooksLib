@@ -10,9 +10,5 @@ public interface BorrowDao {
 
     List<Borrow> findAll();
 
-    List<Borrow> findAllReadersWithTheirBorrows();
-
-    List<Borrow> findAllBooksWithTheirBorrowers();
-
     int returnBook(long bookId, long readerId);
 }

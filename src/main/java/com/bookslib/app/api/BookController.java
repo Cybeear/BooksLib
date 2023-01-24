@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<Book> saveNewBook(@RequestBody @Valid Book book) {
-        return ResponseEntity.ok(bookService.addBook(book));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
     }
 
     @GetMapping("/{bookId}")
@@ -38,16 +39,16 @@ public class BookController {
         return bookService
                 .getBookById(bookId)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/readers/{readerId}")
+    @GetMapping("/{readerId}/readers")
     public ResponseEntity<List<Book>> getListByReaderId(@PathVariable(name = "readerId")
                                                         @Min(value = 1,
                                                                 message = "Reader ID must be a positive number and higher then 0")
                                                         long readerId) {
         var books = bookService.getAllBorrowedByReaderId(readerId);
-        return books.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.ok(books);
+        return books.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(books);
     }
 
 
