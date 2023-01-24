@@ -28,7 +28,7 @@ public class ReaderController {
 
     @PostMapping
     public ResponseEntity<Reader> addNewReader(@RequestBody @Valid Reader reader) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(readerService.registerReader(reader));
+        return ResponseEntity.ok(readerService.registerReader(reader));
     }
 
     @GetMapping("/{readerId}")

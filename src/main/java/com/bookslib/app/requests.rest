@@ -46,12 +46,12 @@ Accept: application/json
 
 # Borrow controller requests example #
 
-### Get request to borrow controller return list of readers
+### Get request to borrow controller return list of borrows
 GET http://localhost:8081/bookslib/api/v1/library/borrows
 Accept: application/json
 
 
-### Get request to borrow controller return list of readers
+### Get request to borrow controller return Borrow object
 POST http://localhost:8081/bookslib/api/v1/library/borrows?readerId=3&bookId=4
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded

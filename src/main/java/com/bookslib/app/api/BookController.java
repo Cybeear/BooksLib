@@ -28,7 +28,7 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<Book> saveNewBook(@RequestBody @Valid Book book) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
+        return ResponseEntity.ok(bookService.addBook(book));
     }
 
     @GetMapping("/{bookId}")

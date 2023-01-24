@@ -31,8 +31,8 @@ public class BorrowController {
             @Min(value = 1, message = "Book ID must be a positive number and higher then 0") long bookId) {
         return borrowService
                 .borrowBook(readerId, bookId)
-                .map(ResponseEntity.status(HttpStatus.CREATED)::body)
-                .orElseGet(() -> ResponseEntity.ok().build());
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @DeleteMapping
