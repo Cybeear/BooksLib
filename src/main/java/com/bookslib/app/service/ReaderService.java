@@ -2,7 +2,6 @@ package com.bookslib.app.service;
 
 import com.bookslib.app.dao.ReaderDao;
 import com.bookslib.app.entity.Reader;
-import com.bookslib.app.exceptions.LibraryServiceException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

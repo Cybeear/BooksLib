@@ -2,12 +2,11 @@ package com.bookslib.app.service;
 
 import com.bookslib.app.dao.BorrowDao;
 import com.bookslib.app.entity.Borrow;
+import com.bookslib.app.exceptions.BorrowServiceException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Data
@@ -16,24 +15,21 @@ public class BorrowService {
     private final BorrowDao borrowDao;
 
     /**
-     * @param readerId
-     * @param bookId
-     * @return
+     * @param borrow
      */
-    public Optional<Borrow> borrowBook(long readerId, long bookId) {
-        return borrowDao.save(bookId, readerId);
+    public void borrowBook(Borrow borrow) throws BorrowServiceException {
+        try {
+            borrowDao.save(borrow);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            log.info("Trying to create duplicated data:\t {}", borrow);
+            throw new BorrowServiceException("Trying to create duplicated data!");
+        }
     }
 
     /**
-     * @param readerId
-     * @param bookId
-     * @return
+     * @param borrow
      */
-    public int returnBook(long readerId, long bookId) {
-            return borrowDao.returnBook(bookId, readerId);
-    }
-
-    public List<Borrow> getAll() {
-        return borrowDao.findAll();
+    public void returnBook(Borrow borrow) {
+        borrowDao.returnBook(borrow);
     }
 }

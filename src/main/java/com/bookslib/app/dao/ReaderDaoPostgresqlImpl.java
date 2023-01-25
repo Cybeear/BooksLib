@@ -2,6 +2,7 @@ package com.bookslib.app.dao;
 
 import com.bookslib.app.entity.Reader;
 import com.bookslib.app.exceptions.BookDaoException;
+import com.bookslib.app.exceptions.ReaderDaoException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -48,9 +49,12 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             }, keyHolder);
             reader.setId((Integer) keyHolder.getKeys().get("id"));
             return reader;
+        } catch (NullPointerException nullPointerException) {
+            log.error("Error, returned generated keys are null! Reader data: {}", reader);
+            throw new ReaderDaoException(nullPointerException.getLocalizedMessage());
         } catch (DataAccessException dataAccessException) {
             log.error("Error save reader!\t{}", reader);
-            throw new BookDaoException(dataAccessException.getLocalizedMessage());
+            throw new ReaderDaoException(dataAccessException.getLocalizedMessage());
         }
     }
 
@@ -71,7 +75,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             return Optional.empty();
         } catch (DataAccessException dataAccessException) {
             log.error("Error fetch reader from DB!\t book id - {}", readerId);
-            throw new BookDaoException(dataAccessException.getLocalizedMessage());
+            throw new ReaderDaoException(dataAccessException.getLocalizedMessage());
         }
     }
 
@@ -85,7 +89,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             return jdbcTemplate.query(findAllReadersSql, this::mapToReader);
         } catch (DataAccessException dataAccessException) {
             log.error("Error fetch reader from DB!");
-            throw new BookDaoException(dataAccessException.getLocalizedMessage());
+            throw new ReaderDaoException(dataAccessException.getLocalizedMessage());
         }
     }
 
@@ -106,7 +110,7 @@ public class ReaderDaoPostgresqlImpl implements ReaderDao {
             return jdbcTemplate.query(findAllReadersByBookIdSql, this::mapToReader, bookId);
         } catch (DataAccessException dataAccessException) {
             log.error("Error fetch readers from DB!\t book id - {}", bookId);
-            throw new BookDaoException(dataAccessException.getLocalizedMessage());
+            throw new ReaderDaoException(dataAccessException.getLocalizedMessage());
         }
     }
 }
