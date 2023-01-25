@@ -28,12 +28,6 @@ public class BookService {
      * @return
      */
     public Optional<Book> getBookById(long bookId) {
-        /*if (bookId < 1) {
-            throw new DataValidationError(
-                    Map.of("fieldName", "name",
-                            "invalidValue", bookId,
-                            "errorMessage", "Book id can not be negative"));
-        }*/
         return bookDao.findById(bookId);
     }
 

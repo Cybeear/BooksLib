@@ -2,6 +2,7 @@ package com.bookslib.app.dao;
 
 import com.bookslib.app.entity.Book;
 import com.bookslib.app.exceptions.BookDaoException;
+import com.bookslib.app.exceptions.InternalErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -50,9 +51,12 @@ public class BookDaoPostgresqlImpl implements BookDao {
             }, keyHolder);
             book.setId((Integer) keyHolder.getKeys().get("id"));
             return book;
+        } catch (NullPointerException nullPointerException) {
+            log.error("Error, returned generated keys are null! Book data: {}", book);
+            throw new BookDaoException(nullPointerException.getLocalizedMessage());
         } catch (DataAccessException dataAccessException) {
             log.error("Error save book!\t{}", book);
-            throw new BookDaoException(dataAccessException.getLocalizedMessage());
+            throw new InternalErrorException(dataAccessException.getLocalizedMessage());
         }
     }
 

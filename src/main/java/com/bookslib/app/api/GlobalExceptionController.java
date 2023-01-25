@@ -1,7 +1,8 @@
-package com.bookslib.app.exceptions;
+package com.bookslib.app.api;
 
 import com.bookslib.app.entity.ApiError;
 import com.bookslib.app.entity.ApiValidationError;
+import com.bookslib.app.exceptions.*;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,14 +21,14 @@ import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionController {
 
     @ExceptionHandler({NoHandlerFoundException.class})
     public ResponseEntity<ApiError> handlerNoHandlerFoundException(NoHandlerFoundException ex) {
         var apiError = new ApiError(String.format("It`s invalid URL: %s",
                 ex.getRequestURL()));
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler {
         var error = "Malformed JSON request";
         var apiError = new ApiError(error, ex);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException ex) {
         String error = ex.getParameterName() + " parameter is missing";
         var apiError = new ApiError(error, ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException ex) {
         var apiError = new ApiError("Request body contains invalid values!");
         apiError.addValidationErrors(ex.getConstraintViolations());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
@@ -76,7 +77,7 @@ public class GlobalExceptionHandler {
         var apiError = new ApiError("Request body contains invalid values!");
         apiError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         apiError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
@@ -89,7 +90,37 @@ public class GlobalExceptionHandler {
                 List.of(new ApiValidationError(ex.getName(),
                         ex.getValue(),
                         ex.getLocalizedMessage())));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
+    }
 
+    @ExceptionHandler({BorrowDaoException.class})
+    public ResponseEntity<ApiError> handleBorrowDaoException(BorrowDaoException borrowDaoException) {
+        var apiError = new ApiError(borrowDaoException.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    @ExceptionHandler({BorrowServiceException.class})
+    public ResponseEntity<ApiError> handleBorrowServiceException(BorrowServiceException borrowServiceException) {
+        var apiError = new ApiError(borrowServiceException.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+
+    @ExceptionHandler({BookDaoException.class})
+    public ResponseEntity<ApiError> handleBookDaoException(BookDaoException bookDaoException) {
+        var apiError = new ApiError(bookDaoException.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    @ExceptionHandler({ReaderDaoException.class})
+    public ResponseEntity<ApiError> handleReaderDaoException(ReaderDaoException readerDaoException) {
+        var apiError = new ApiError(readerDaoException.getLocalizedMessage());
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    @ExceptionHandler({InternalErrorException.class})
+    public ResponseEntity<ApiError> handleInternalErrorException(InternalErrorException internalErrorException) {
+        var apiError = new ApiError("Server internal error!" + internalErrorException.getLocalizedMessage());
+        return ResponseEntity.internalServerError().body(apiError);
     }
 }

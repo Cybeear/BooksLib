@@ -1,7 +1,5 @@
 package com.bookslib.app.dao;
 
-import com.bookslib.app.dao.BookDao;
-import com.bookslib.app.dao.BookDaoPostgresqlImpl;
 import com.bookslib.app.entity.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,9 +19,11 @@ class BookDaoPostgresqlImplTest {
 
     @Test
     void saveThenBookNotNull() {
-        Book book = new Book("test", "test");
-        assertNotNull(bookDao.save(book),
-                "DAO can not return (book == null) after successful save to DB!");
+        Book book = new Book();
+        book.setName("test");
+        book.setAuthor("test");
+        assertNotEquals(1, bookDao.save(book),
+                "DAO can not return id after successful save to DB!");
     }
 
     @Test

@@ -1,0 +1,81 @@
+# Book controller requests example #
+
+### Get request to book controller return list of books
+GET http://localhost:8081/bookslib/api/v1/library/books
+Accept: application/json
+
+### Post request to book controller return created book
+POST http://localhost:8081/bookslib/api/v1/library/books
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "textfield",
+  "author": "textfield"
+}
+
+### Get request to book controller, return book by id
+GET http://localhost:8081/bookslib/api/v1/library/books/1
+Accept: application/json
+
+### Get request to book controller, return list of books by reader id
+GET http://localhost:8081/bookslib/api/v1/library/books/1/readers
+Accept: application/json
+
+# Reader controller requests example #
+
+### Get request to reader controller return list of readers
+GET http://localhost:8081/bookslib/api/v1/library/readers
+Accept: application/json
+
+### Post request to reader controller return created reader
+POST http://localhost:8081/bookslib/api/v1/library/readers
+Content-Type: application/json
+
+{
+  "name": "textfield"
+}
+
+### Get request to reader controller, return reader by id
+GET http://localhost:8081/bookslib/api/v1/library/readers/1
+Accept: application/json
+
+### Get request to reader controller, return list of readers by book id
+GET http://localhost:8081/bookslib/api/v1/library/readers/1/books
+Accept: application/json
+
+# Borrow controller requests example #
+
+### POST request to borrow controller return Borrow object
+POST http://localhost:8081/bookslib/api/v1/library/borrows?readerId=3&bookId=4
+Accept: application/json
+Content-Type: application/json
+
+{
+  "reader":
+    {
+      "id": 4
+    },
+  "book":
+  {
+      "id": 3
+  }
+}
+
+
+### DELETE request to borrow controller return Http status code
+DELETE http://localhost:8081/bookslib/api/v1/library/borrows
+Accept: application/json
+Content-Type: application/json
+
+{
+  "reader":
+  {
+    "id": 4
+  },
+  "book":
+  {
+    "id": 3
+  }
+}
+
